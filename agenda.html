@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -67,7 +67,6 @@ textarea { resize: vertical; min-height: 70px; }
 .modal-overlay.open { display: flex; }
 .modal { background: white; border-radius: 12px; padding: 20px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
 .modal h2 { margin-bottom: 16px; font-size: 1rem; }
-/* Config screen */
 #config-screen { display: none; position: fixed; inset: 0; background: var(--gray); z-index: 200; overflow-y: auto; padding: 24px 16px; }
 #config-screen.visible { display: block; }
 #config-screen h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: var(--text); }
@@ -79,7 +78,6 @@ textarea { resize: vertical; min-height: 70px; }
 </head>
 <body ontouchstart="">
 
-<!-- Pantalla de configuración -->
 <div id="config-screen">
   <div class="config-logo">📅</div>
   <h2>Configuración de Agenda</h2>
@@ -299,6 +297,11 @@ var calFecha = new Date();
 var filtroActivo = 'todos';
 var tabPanels = ['cargar', 'calendario', 'turnos'];
 
+function limpiarFecha(f) {
+  if (!f) return '';
+  return String(f).substring(0, 10);
+}
+
 function showTab(t) {
   for (var i = 0; i < tabPanels.length; i++) {
     document.getElementById('tab-' + tabPanels[i]).className = 'panel';
@@ -381,7 +384,7 @@ function renderTurnos() {
   var hoyStr = hoy();
   if (filtroActivo === 'hoy') {
     var tmp = [];
-    for (var i = 0; i < filtrados.length; i++) { if (filtrados[i].fecha === hoyStr) tmp.push(filtrados[i]); }
+    for (var i = 0; i < filtrados.length; i++) { if (limpiarFecha(filtrados[i].fecha) === hoyStr) tmp.push(filtrados[i]); }
     filtrados = tmp;
   }
   if (filtroActivo === 'semana') {
@@ -390,17 +393,17 @@ function renderTurnos() {
     d.setDate(d.getDate() + 6);
     var fin = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     var tmp2 = [];
-    for (var i = 0; i < filtrados.length; i++) { if (filtrados[i].fecha >= ini && filtrados[i].fecha <= fin) tmp2.push(filtrados[i]); }
+    for (var i = 0; i < filtrados.length; i++) { var f = limpiarFecha(filtrados[i].fecha); if (f >= ini && f <= fin) tmp2.push(filtrados[i]); }
     filtrados = tmp2;
   }
-  filtrados.sort(function(a,b) { return (a.fecha+a.hora).localeCompare(b.fecha+b.hora); });
+  filtrados.sort(function(a,b) { return (limpiarFecha(a.fecha)+a.hora).localeCompare(limpiarFecha(b.fecha)+b.hora); });
   if (!filtrados.length) { lista.innerHTML = '<div class="empty">No hay turnos</div>'; return; }
   var html = '';
   for (var i = 0; i < filtrados.length; i++) {
     var t = filtrados[i];
     html += '<div class="turno-card">' +
       '<h3>' + t.cliente + ' <span class="badge badge-blue">' + t.hora + '</span></h3>' +
-      '<p>' + t.fecha + (t.empleado ? ' · ' + t.empleado : '') + (t.servicio ? ' · ' + t.servicio : '') + (t.monto ? ' · $' + t.monto : '') + '</p>' +
+      '<p>' + limpiarFecha(t.fecha) + (t.empleado ? ' · ' + t.empleado : '') + (t.servicio ? ' · ' + t.servicio : '') + (t.monto ? ' · $' + t.monto : '') + '</p>' +
       (t.notas ? '<p style="margin-top:4px;font-style:italic">' + t.notas + '</p>' : '') +
       '<div class="turno-actions">' +
       '<button class="btn-sm btn-edit" onclick="abrirEditar(\'' + t.id + '\')">Editar</button>' +
@@ -434,7 +437,7 @@ function abrirEditar(id) {
   if (!t) return;
   document.getElementById('e-id').value = t.id;
   document.getElementById('e-cliente').value = t.cliente;
-  document.getElementById('e-fecha').value = t.fecha;
+  document.getElementById('e-fecha').value = limpiarFecha(t.fecha);
   document.getElementById('e-hora').value = t.hora;
   document.getElementById('e-empleado').value = t.empleado || '';
   document.getElementById('e-telefono').value = t.telefono || '';
@@ -491,7 +494,7 @@ function renderCalendario() {
   for (var d = 1; d <= ultimo; d++) {
     var ds = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     var tiene = false;
-    for (var i = 0; i < turnos.length; i++) { if (turnos[i].fecha === ds) { tiene = true; break; } }
+    for (var i = 0; i < turnos.length; i++) { if (limpiarFecha(turnos[i].fecha) === ds) { tiene = true; break; } }
     var esHoy = ds === hoyStr;
     html += '<div class="cal-day' + (esHoy ? ' today' : '') + '" onclick="verDia(\'' + ds + '\')">' +
       '<div class="num">' + d + '</div>' + (tiene ? '<div class="dot"></div>' : '') + '</div>';
@@ -506,8 +509,8 @@ function cambiarMes(d) {
 
 function verDia(fecha) {
   var del = [];
-  for (var i = 0; i < turnos.length; i++) { if (turnos[i].fecha === fecha) del.push(turnos[i]); }
-  del.sort(function(a,b) { return a.hora.localeCompare(b.hora); });
+  for (var i = 0; i < turnos.length; i++) { if (limpiarFecha(turnos[i].fecha) === fecha) del.push(turnos[i]); }
+  del.sort(function(a,b) { return (a.hora||'').localeCompare(b.hora||''); });
   var cont = document.getElementById('turnos-dia');
   if (!del.length) { cont.innerHTML = '<div class="card"><p class="empty">Sin turnos el ' + fecha + '</p></div>'; return; }
   var html = '<div class="card"><h3 style="margin-bottom:10px;font-size:0.9rem;color:var(--muted)">' + fecha + '</h3>';
