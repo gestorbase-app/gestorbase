@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="apple-touch-icon" href="gestorbase-icono-180.png">
+<link rel="manifest" href="manifest-premium.json">
 <title>GestorBase Premium</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +29,6 @@
 
   .seccion-titulo { padding: 4px 16px 0; font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.8px; }
 
-  /* Config overlay */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; }
   .overlay.visible { display: flex; }
   .modal { background: white; border-radius: 16px; padding: 24px 20px; width: 100%; max-width: 420px; margin: auto; }
@@ -102,22 +103,18 @@
 </div>
 <div style="height:20px;"></div>
 
-<!-- Config overlay -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <h2>⚙️ Configuración</h2>
-
     <div class="campo">
       <label>Nombre del negocio</label>
       <input type="text" id="cfgNegocio" placeholder="Mi Negocio">
     </div>
-
     <div class="campo">
       <label>URL del Google Apps Script</label>
       <input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/...">
       <div class="nota">La misma URL para todos los módulos</div>
     </div>
-
     <div class="fila-colores">
       <div class="campo">
         <label>Color principal</label>
@@ -128,22 +125,18 @@
         <input type="color" id="cfgColor2" value="#0057d9">
       </div>
     </div>
-
     <div class="campo">
       <label>Empleados (uno por línea)</label>
       <textarea id="cfgEmpleados" placeholder="Empleado 1&#10;Empleado 2&#10;Empleado 3"></textarea>
     </div>
-
     <div class="campo">
       <label>Categorías de gastos (una por línea)</label>
       <textarea id="cfgCategorias" placeholder="Insumos&#10;Servicios&#10;Sueldos"></textarea>
     </div>
-
     <div class="campo">
       <label>Porcentaje de comisión (%)</label>
       <input type="number" id="cfgComision" min="0" max="100" placeholder="50">
     </div>
-
     <button class="btn-guardar" id="btnGuardar">Guardar configuración</button>
     <button class="btn-cancelar" id="btnCancelar">Cancelar</button>
   </div>
