@@ -3,7 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="apple-touch-icon" href="gestorbase-icono-180.png">
+<link rel="manifest" href="manifest.json">
 <title id="page-title">Agenda</title>
+<script>
+const CONFIG = {
+  negocio: "Mi Negocio",
+  colorPrincipal: "#003b8e",
+  colorAccent: "#0057d9",
+  empleados: [
+    "Empleado 1",
+    "Empleado 2",
+    "Empleado 3"
+  ],
+  urlSheet: "https://script.google.com/macros/s/AKfycbysVKNyxlIXu1V4g7ZPWoEJok7u2MindnERNqbiP-1X_uKDAhgwgUn8JhYzYi3NZqqFNw/exec",
+  trabajaSabado: false
+};
+</script>
 <style>
 :root {
   --blue: #003b8e;
@@ -19,7 +35,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: system-ui, sans-serif; background: var(--gray); color: var(--text); min-height: 100vh; }
 header { background: var(--blue); color: white; padding: 14px 20px; display: flex; align-items: center; gap: 10px; }
-header h1 { font-size: 1.1rem; font-weight: 600; flex: 1; }
+header h1 { font-size: 1.1rem; font-weight: 600; }
 .tabs { display: flex; background: white; border-bottom: 2px solid var(--border); }
 .tab { flex: 1; padding: 14px 12px; text-align: center; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--muted); border: none; background: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
 .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); margin-bottom: -2px; }
@@ -67,58 +83,19 @@ textarea { resize: vertical; min-height: 70px; }
 .modal-overlay.open { display: flex; }
 .modal { background: white; border-radius: 12px; padding: 20px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
 .modal h2 { margin-bottom: 16px; font-size: 1rem; }
-#config-screen { display: none; position: fixed; inset: 0; background: var(--gray); z-index: 200; overflow-y: auto; padding: 24px 16px; }
-#config-screen.visible { display: block; }
-#config-screen h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: var(--text); }
-#config-screen p { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
-.color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.color-row input[type="color"] { height: 44px; padding: 4px 6px; cursor: pointer; }
-.config-logo { font-size: 2rem; text-align: center; margin-bottom: 8px; }
 </style>
 </head>
-<body ontouchstart="">
-
-<div id="config-screen">
-  <div class="config-logo">📅</div>
-  <h2>Configuración de Agenda</h2>
-  <p>Completá los datos de tu negocio. Podés editarlos cuando quieras desde el botón ⚙️.</p>
-  <div class="card">
-    <div class="form-group">
-      <label>Nombre del negocio</label>
-      <input type="text" id="cfg-negocio" placeholder="Ej: Peluquería Carla">
-    </div>
-    <div class="form-group">
-      <label>URL de tu planilla Google</label>
-      <input type="url" id="cfg-url" placeholder="https://script.google.com/...">
-    </div>
-    <div class="color-row">
-      <div class="form-group">
-        <label>Color principal</label>
-        <input type="color" id="cfg-color1" value="#003b8e">
-      </div>
-      <div class="form-group">
-        <label>Color acento</label>
-        <input type="color" id="cfg-color2" value="#0057d9">
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Empleados (uno por línea)</label>
-      <textarea id="cfg-empleados" rows="4" placeholder="Empleado 1&#10;Empleado 2&#10;Empleado 3"></textarea>
-    </div>
-    <button class="btn" id="btn-guardar-config">Guardar y continuar</button>
-  </div>
-</div>
+<body>
 
 <header>
   <span style="font-size:1.4rem">📅</span>
   <h1 id="header-title">Agenda</h1>
-  <button id="btn-abrir-config" style="background:none;border:none;color:white;font-size:1.3rem;cursor:pointer;padding:4px;touch-action:manipulation;">⚙️</button>
 </header>
 
-<div class="tabs" id="tabs-bar">
-  <button class="tab active" id="tab-btn-cargar">+ Cargar</button>
-  <button class="tab" id="tab-btn-calendario">📅 Calendario</button>
-  <button class="tab" id="tab-btn-turnos">📋 Turnos</button>
+<div class="tabs">
+  <button class="tab active" onclick="showTab('cargar',this)">+ Cargar</button>
+  <button class="tab" onclick="showTab('calendario',this)">📅 Calendario</button>
+  <button class="tab" onclick="showTab('turnos',this)">📋 Turnos</button>
 </div>
 
 <div id="tab-cargar" class="panel active">
@@ -164,16 +141,16 @@ textarea { resize: vertical; min-height: 70px; }
       <label>Notas (opcional)</label>
       <textarea id="f-notas" placeholder="Observaciones..."></textarea>
     </div>
-    <button class="btn" id="btn-guardar-turno">Guardar turno</button>
+    <button class="btn" onclick="guardarTurno()">Guardar turno</button>
   </div>
 </div>
 
 <div id="tab-calendario" class="panel">
   <div class="card">
     <div class="cal-nav">
-      <button id="btn-mes-prev">&#8249;</button>
+      <button onclick="cambiarMes(-1)">&#8249;</button>
       <span id="cal-titulo"></span>
-      <button id="btn-mes-next">&#8250;</button>
+      <button onclick="cambiarMes(1)">&#8250;</button>
     </div>
     <div class="calendario" id="cal-grid"></div>
   </div>
@@ -182,9 +159,9 @@ textarea { resize: vertical; min-height: 70px; }
 
 <div id="tab-turnos" class="panel">
   <div class="filtros">
-    <div class="chip active" id="chip-todos">Todos</div>
-    <div class="chip" id="chip-hoy">Hoy</div>
-    <div class="chip" id="chip-semana">Esta semana</div>
+    <div class="chip active" onclick="filtrarTurnos('todos',this)">Todos</div>
+    <div class="chip" onclick="filtrarTurnos('hoy',this)">Hoy</div>
+    <div class="chip" onclick="filtrarTurnos('semana',this)">Esta semana</div>
   </div>
   <div id="lista-turnos"></div>
 </div>
@@ -208,122 +185,37 @@ textarea { resize: vertical; min-height: 70px; }
     </div>
     <div class="form-group"><label>Notas</label><textarea id="e-notas"></textarea></div>
     <div id="msg-editar" class="msg"></div>
-    <button class="btn" id="btn-guardar-edicion">Guardar cambios</button>
-    <button class="btn" style="background:#6b7280;margin-top:8px" id="btn-cancelar-edicion">Cancelar</button>
+    <button class="btn" onclick="guardarEdicion()">Guardar cambios</button>
+    <button class="btn" style="background:#6b7280;margin-top:8px" onclick="cerrarModal()">Cancelar</button>
   </div>
 </div>
 
 <script>
-var CONFIG_KEY = 'gestorbase_config';
-var CONFIG_DEFAULT = {
-  negocio: 'Mi Negocio',
-  colorPrincipal: '#003b8e',
-  colorAccent: '#0057d9',
-  urlSheet: '',
-  empleados: ['Empleado 1', 'Empleado 2', 'Empleado 3']
-};
-var savedConfig = {};
-try { savedConfig = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch(e) {}
-var CONFIG = {};
-var keys = Object.keys(CONFIG_DEFAULT);
-for (var ki = 0; ki < keys.length; ki++) {
-  CONFIG[keys[ki]] = savedConfig[keys[ki]] !== undefined ? savedConfig[keys[ki]] : CONFIG_DEFAULT[keys[ki]];
-}
+document.getElementById('page-title').textContent = CONFIG.negocio + ' — Agenda';
+document.getElementById('header-title').textContent = CONFIG.negocio + ' — Agenda';
+document.documentElement.style.setProperty('--blue', CONFIG.colorPrincipal);
+document.documentElement.style.setProperty('--accent', CONFIG.colorAccent);
 
-function aplicarConfig() {
-  document.getElementById('page-title').textContent = CONFIG.negocio + ' — Agenda';
-  document.getElementById('header-title').textContent = CONFIG.negocio + ' — Agenda';
-  document.documentElement.style.setProperty('--blue', CONFIG.colorPrincipal);
-  document.documentElement.style.setProperty('--accent', CONFIG.colorAccent);
-  var selEmpleado = document.getElementById('f-empleado');
-  var selEmpleadoE = document.getElementById('e-empleado');
-  selEmpleado.innerHTML = '<option value="">— Sin asignar —</option>';
-  selEmpleadoE.innerHTML = '<option value="">— Sin asignar —</option>';
-  for (var ei = 0; ei < CONFIG.empleados.length; ei++) {
-    selEmpleado.innerHTML += '<option value="' + CONFIG.empleados[ei] + '">' + CONFIG.empleados[ei] + '</option>';
-    selEmpleadoE.innerHTML += '<option value="' + CONFIG.empleados[ei] + '">' + CONFIG.empleados[ei] + '</option>';
-  }
-}
-
-function abrirConfig() {
-  document.getElementById('cfg-negocio').value = CONFIG.negocio;
-  document.getElementById('cfg-url').value = CONFIG.urlSheet;
-  document.getElementById('cfg-color1').value = CONFIG.colorPrincipal;
-  document.getElementById('cfg-color2').value = CONFIG.colorAccent;
-  document.getElementById('cfg-empleados').value = CONFIG.empleados.join('\n');
-  document.getElementById('config-screen').className = 'visible';
-}
-
-document.getElementById('btn-guardar-config').addEventListener('click', function() {
-  var negocio = document.getElementById('cfg-negocio').value.trim();
-  var url = document.getElementById('cfg-url').value.trim();
-  if (!negocio || !url) {
-    alert('Completá el nombre del negocio y la URL de la planilla.');
-    return;
-  }
-  var empleadosRaw = document.getElementById('cfg-empleados').value.trim();
-  var empleados = [];
-  var lineas = empleadosRaw.split('\n');
-  for (var i = 0; i < lineas.length; i++) {
-    var l = lineas[i].trim();
-    if (l) empleados.push(l);
-  }
-  if (!empleados.length) empleados = ['Empleado 1'];
-  var nuevaConfig = {
-    negocio: negocio,
-    urlSheet: url,
-    colorPrincipal: document.getElementById('cfg-color1').value,
-    colorAccent: document.getElementById('cfg-color2').value,
-    empleados: empleados
-  };
-  try { localStorage.setItem(CONFIG_KEY, JSON.stringify(nuevaConfig)); } catch(e) {}
-  location.reload();
+const selEmpleado = document.getElementById('f-empleado');
+const selEmpleadoE = document.getElementById('e-empleado');
+CONFIG.empleados.forEach(function(e) {
+  selEmpleado.innerHTML += '<option value="' + e + '">' + e + '</option>';
+  selEmpleadoE.innerHTML += '<option value="' + e + '">' + e + '</option>';
 });
 
-document.getElementById('btn-abrir-config').addEventListener('click', function() {
-  abrirConfig();
-});
-
-if (!savedConfig.negocio) {
-  abrirConfig();
-}
-
-aplicarConfig();
-
-var STORAGE_KEY = 'gestorbase_agenda_' + CONFIG.negocio;
-var turnos = [];
-try { turnos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { turnos = []; }
+const STORAGE_KEY = 'gestorbase_agenda_' + CONFIG.negocio;
+var turnos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 var calFecha = new Date();
 var filtroActivo = 'todos';
-var tabPanels = ['cargar', 'calendario', 'turnos'];
 
-function limpiarFecha(f) {
-  if (!f) return '';
-  return String(f).substring(0, 10);
-}
-
-function showTab(t) {
-  for (var i = 0; i < tabPanels.length; i++) {
-    document.getElementById('tab-' + tabPanels[i]).className = 'panel';
-    document.getElementById('tab-btn-' + tabPanels[i]).className = 'tab';
-  }
-  document.getElementById('tab-' + t).className = 'panel active';
-  document.getElementById('tab-btn-' + t).className = 'tab active';
+function showTab(t, el) {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + t).classList.add('active');
+  if (el) el.classList.add('active');
   if (t === 'calendario') renderCalendario();
   if (t === 'turnos') renderTurnos();
 }
-
-document.getElementById('tab-btn-cargar').addEventListener('click', function() { showTab('cargar'); });
-document.getElementById('tab-btn-calendario').addEventListener('click', function() { showTab('calendario'); });
-document.getElementById('tab-btn-turnos').addEventListener('click', function() { showTab('turnos'); });
-document.getElementById('btn-mes-prev').addEventListener('click', function() { cambiarMes(-1); });
-document.getElementById('btn-mes-next').addEventListener('click', function() { cambiarMes(1); });
-document.getElementById('btn-guardar-turno').addEventListener('click', guardarTurno);
-document.getElementById('btn-guardar-edicion').addEventListener('click', guardarEdicion);
-document.getElementById('btn-cancelar-edicion').addEventListener('click', cerrarModal);
-document.getElementById('chip-todos').addEventListener('click', function() { filtrarTurnos('todos', this); });
-document.getElementById('chip-hoy').addEventListener('click', function() { filtrarTurnos('hoy', this); });
-document.getElementById('chip-semana').addEventListener('click', function() { filtrarTurnos('semana', this); });
 
 function hoy() {
   var d = new Date();
@@ -335,13 +227,18 @@ function guardarTurno() {
   var fecha = document.getElementById('f-fecha').value;
   var hora = document.getElementById('f-hora').value;
   var msg = document.getElementById('msg-cargar');
+
   if (!cliente || !fecha || !hora) {
     msg.className = 'msg err';
     msg.textContent = 'Completá Cliente, Fecha y Hora.';
     return;
   }
+
   var datos = {
-    accion: 'agenda', cliente: cliente, fecha: fecha, hora: hora,
+    accion: 'agenda',
+    cliente: cliente,
+    fecha: fecha,
+    hora: hora,
     empleado: document.getElementById('f-empleado').value,
     telefono: document.getElementById('f-telefono').value,
     servicio: document.getElementById('f-servicio').value,
@@ -349,19 +246,26 @@ function guardarTurno() {
     notas: document.getElementById('f-notas').value,
     id: Date.now().toString()
   };
+
   msg.className = 'msg ok';
   msg.textContent = 'Guardando...';
-  fetch(CONFIG.urlSheet, { method: 'POST', body: JSON.stringify(datos) })
+
+  fetch(CONFIG.urlSheet, {
+    method: 'POST',
+    body: JSON.stringify(datos)
+  })
   .then(function(r) { return r.json(); })
   .then(function() {
-    turnos.push(datos);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos)); } catch(e) {}
+    var turno = Object.assign({}, datos);
+    turnos.push(turno);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos));
     msg.textContent = '✓ Turno guardado correctamente';
     limpiarForm();
   })
   .catch(function() {
-    turnos.push(datos);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos)); } catch(e) {}
+    var turno = Object.assign({}, datos);
+    turnos.push(turno);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos));
     msg.textContent = '✓ Guardado localmente (sin conexión)';
     limpiarForm();
   });
@@ -382,52 +286,40 @@ function renderTurnos() {
   var lista = document.getElementById('lista-turnos');
   var filtrados = turnos.slice();
   var hoyStr = hoy();
-  if (filtroActivo === 'hoy') {
-    var tmp = [];
-    for (var i = 0; i < filtrados.length; i++) { if (limpiarFecha(filtrados[i].fecha) === hoyStr) tmp.push(filtrados[i]); }
-    filtrados = tmp;
-  }
+  if (filtroActivo === 'hoy') filtrados = filtrados.filter(function(t) { return t.fecha === hoyStr; });
   if (filtroActivo === 'semana') {
     var d = new Date(); d.setDate(d.getDate() - d.getDay() + 1);
     var ini = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     d.setDate(d.getDate() + 6);
     var fin = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    var tmp2 = [];
-    for (var i = 0; i < filtrados.length; i++) { var f = limpiarFecha(filtrados[i].fecha); if (f >= ini && f <= fin) tmp2.push(filtrados[i]); }
-    filtrados = tmp2;
+    filtrados = filtrados.filter(function(t) { return t.fecha >= ini && t.fecha <= fin; });
   }
-  filtrados.sort(function(a,b) { return (limpiarFecha(a.fecha)+a.hora).localeCompare(limpiarFecha(b.fecha)+b.hora); });
+  filtrados.sort(function(a,b) { return (a.fecha+a.hora).localeCompare(b.fecha+b.hora); });
   if (!filtrados.length) { lista.innerHTML = '<div class="empty">No hay turnos</div>'; return; }
-  var html = '';
-  for (var i = 0; i < filtrados.length; i++) {
-    var t = filtrados[i];
-    html += '<div class="turno-card">' +
+  lista.innerHTML = filtrados.map(function(t) {
+    return '<div class="turno-card">' +
       '<h3>' + t.cliente + ' <span class="badge badge-blue">' + t.hora + '</span></h3>' +
-      '<p>' + limpiarFecha(t.fecha) + (t.empleado ? ' · ' + t.empleado : '') + (t.servicio ? ' · ' + t.servicio : '') + (t.monto ? ' · $' + t.monto : '') + '</p>' +
+      '<p>' + t.fecha + (t.empleado ? ' · ' + t.empleado : '') + (t.servicio ? ' · ' + t.servicio : '') + (t.monto ? ' · $' + t.monto : '') + '</p>' +
       (t.notas ? '<p style="margin-top:4px;font-style:italic">' + t.notas + '</p>' : '') +
       '<div class="turno-actions">' +
       '<button class="btn-sm btn-edit" onclick="abrirEditar(\'' + t.id + '\')">Editar</button>' +
       '<button class="btn-sm btn-del" onclick="borrarTurno(\'' + t.id + '\')">Borrar</button>' +
       '</div></div>';
-  }
-  lista.innerHTML = html;
+  }).join('');
 }
 
 function filtrarTurnos(f, el) {
   filtroActivo = f;
-  var chips = document.querySelectorAll('.chip');
-  for (var i = 0; i < chips.length; i++) { chips[i].className = 'chip'; }
-  if (el) el.className = 'chip active';
+  document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+  if (el) el.classList.add('active');
   renderTurnos();
 }
 
 function borrarTurno(id) {
   if (!confirm('¿Borrar este turno?')) return;
   fetch(CONFIG.urlSheet, { method: 'POST', body: JSON.stringify({ accion: 'agendaBorrar', id: id }) }).catch(function(){});
-  var tmp = [];
-  for (var i = 0; i < turnos.length; i++) { if (turnos[i].id !== id) tmp.push(turnos[i]); }
-  turnos = tmp;
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos)); } catch(e) {}
+  turnos = turnos.filter(function(t) { return t.id !== id; });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos));
   renderTurnos();
 }
 
@@ -437,18 +329,18 @@ function abrirEditar(id) {
   if (!t) return;
   document.getElementById('e-id').value = t.id;
   document.getElementById('e-cliente').value = t.cliente;
-  document.getElementById('e-fecha').value = limpiarFecha(t.fecha);
+  document.getElementById('e-fecha').value = t.fecha;
   document.getElementById('e-hora').value = t.hora;
   document.getElementById('e-empleado').value = t.empleado || '';
   document.getElementById('e-telefono').value = t.telefono || '';
   document.getElementById('e-servicio').value = t.servicio || '';
   document.getElementById('e-monto').value = t.monto || '';
   document.getElementById('e-notas').value = t.notas || '';
-  document.getElementById('modal-editar').className = 'modal-overlay open';
+  document.getElementById('modal-editar').classList.add('open');
 }
 
 function cerrarModal() {
-  document.getElementById('modal-editar').className = 'modal-overlay';
+  document.getElementById('modal-editar').classList.remove('open');
 }
 
 function guardarEdicion() {
@@ -459,7 +351,11 @@ function guardarEdicion() {
   var msg = document.getElementById('msg-editar');
   if (!cliente || !fecha || !hora) { msg.className='msg err'; msg.textContent='Completá Cliente, Fecha y Hora.'; return; }
   var datos = {
-    accion: 'agendaEditar', id: id, cliente: cliente, fecha: fecha, hora: hora,
+    accion: 'agendaEditar',
+    id: id,
+    cliente: cliente,
+    fecha: fecha,
+    hora: hora,
     empleado: document.getElementById('e-empleado').value,
     telefono: document.getElementById('e-telefono').value,
     servicio: document.getElementById('e-servicio').value,
@@ -470,7 +366,7 @@ function guardarEdicion() {
   var idx = -1;
   for (var i = 0; i < turnos.length; i++) { if (turnos[i].id === id) { idx = i; break; } }
   if (idx >= 0) turnos[idx] = datos; else turnos.push(datos);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos)); } catch(e) {}
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos));
   msg.className = 'msg ok'; msg.textContent = '✓ Guardado';
   setTimeout(function() { cerrarModal(); renderTurnos(); }, 800);
 }
@@ -482,8 +378,7 @@ function renderCalendario() {
   var grid = document.getElementById('cal-grid');
   var dias = ['Lu','Ma','Mi','Ju','Vi','Sa','Do'];
   var hoyStr = hoy();
-  var html = '';
-  for (var i = 0; i < dias.length; i++) { html += '<div class="cal-header">' + dias[i] + '</div>'; }
+  var html = dias.map(function(d) { return '<div class="cal-header">' + d + '</div>'; }).join('');
   var primer = new Date(y, m, 1);
   var ini = primer.getDay() - 1; if (ini < 0) ini = 6;
   for (var i = 0; i < ini; i++) {
@@ -493,11 +388,12 @@ function renderCalendario() {
   var ultimo = new Date(y, m+1, 0).getDate();
   for (var d = 1; d <= ultimo; d++) {
     var ds = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    var tiene = false;
-    for (var i = 0; i < turnos.length; i++) { if (limpiarFecha(turnos[i].fecha) === ds) { tiene = true; break; } }
+    var tiene = turnos.some(function(t) { return t.fecha === ds; });
     var esHoy = ds === hoyStr;
     html += '<div class="cal-day' + (esHoy ? ' today' : '') + '" onclick="verDia(\'' + ds + '\')">' +
-      '<div class="num">' + d + '</div>' + (tiene ? '<div class="dot"></div>' : '') + '</div>';
+      '<div class="num">' + d + '</div>' +
+      (tiene ? '<div class="dot"></div>' : '') +
+      '</div>';
   }
   grid.innerHTML = html;
 }
@@ -508,18 +404,17 @@ function cambiarMes(d) {
 }
 
 function verDia(fecha) {
-  var del = [];
-  for (var i = 0; i < turnos.length; i++) { if (limpiarFecha(turnos[i].fecha) === fecha) del.push(turnos[i]); }
-  del.sort(function(a,b) { return (a.hora||'').localeCompare(b.hora||''); });
+  var del = turnos.filter(function(t) { return t.fecha === fecha; });
+  del.sort(function(a,b) { return a.hora.localeCompare(b.hora); });
   var cont = document.getElementById('turnos-dia');
   if (!del.length) { cont.innerHTML = '<div class="card"><p class="empty">Sin turnos el ' + fecha + '</p></div>'; return; }
-  var html = '<div class="card"><h3 style="margin-bottom:10px;font-size:0.9rem;color:var(--muted)">' + fecha + '</h3>';
-  for (var i = 0; i < del.length; i++) {
-    var t = del[i];
-    html += '<div class="turno-card"><h3>' + t.cliente + ' <span class="badge badge-blue">' + t.hora + '</span></h3>' +
-      '<p>' + (t.empleado ? t.empleado + ' · ' : '') + (t.servicio || '') + (t.monto ? ' · $' + t.monto : '') + '</p></div>';
-  }
-  cont.innerHTML = html + '</div>';
+  cont.innerHTML = '<div class="card"><h3 style="margin-bottom:10px;font-size:0.9rem;color:var(--muted)">' + fecha + '</h3>' +
+    del.map(function(t) {
+      return '<div class="turno-card">' +
+        '<h3>' + t.cliente + ' <span class="badge badge-blue">' + t.hora + '</span></h3>' +
+        '<p>' + (t.empleado ? t.empleado + ' · ' : '') + (t.servicio || '') + (t.monto ? ' · $' + t.monto : '') + '</p>' +
+        '</div>';
+    }).join('') + '</div>';
 }
 
 document.getElementById('f-fecha').value = hoy();
@@ -529,7 +424,7 @@ fetch(CONFIG.urlSheet + '?accion=agendaLeer')
   .then(function(data) {
     if (data && data.turnos) {
       turnos = data.turnos;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos)); } catch(e) {}
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos));
     }
   })
   .catch(function() {});
