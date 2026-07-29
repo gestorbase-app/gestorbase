@@ -5,7 +5,7 @@
     { "src": "gestorbase-icono-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "gestorbase-icono-512.png", "sizes": "512x512", "type": "image/png" }
   ],
-  "start_url": "/gestorbase/index.html",
+  "start_url": "/gestorbase/index-premium.html",
   "display": "standalone",
   "background_color": "#F2F8F6",
   "theme_color": "#1B6F5F"
