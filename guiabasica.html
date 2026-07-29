@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestorBase — Guía Plan Básico</title>
+<style>
+:root {
+  --verde: #1B6F5F;
+  --verde-agua: #2EAF96;
+  --coral: #FF6B47;
+  --carbon: #1E2E2B;
+  --fondo: #F2F8F6;
+  --muted: #5a7a74;
+  --borde: #d0e8e2;
+  --amarillo: #fff8e1;
+  --amarillo-borde: #f9c74f;
+  --rojo: #fff0f0;
+  --rojo-borde: #e63946;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--fondo); color: var(--carbon); font-size: 16px; line-height: 1.7; }
+
+header { background: var(--verde); color: white; padding: 32px 24px 28px; text-align: center; }
+.header-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.header-wordmark { line-height: 1; text-align: left; }
+.header-wordmark span:first-child { display: block; font-size: 18px; font-weight: 300; color: rgba(255,255,255,0.85); }
+.header-wordmark span:last-child { display: block; font-size: 18px; font-weight: 800; color: var(--verde-agua); }
+header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+header p { font-size: 1rem; opacity: 0.8; }
+
+nav { background: white; border-bottom: 2px solid var(--borde); padding: 14px 20px; position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+nav a { color: var(--verde); text-decoration: none; font-size: 13px; font-weight: 600; padding: 5px 12px; border: 1px solid var(--borde); border-radius: 20px; transition: background 0.15s; white-space: nowrap; }
+nav a:hover { background: var(--fondo); }
+
+main { max-width: 820px; margin: 0 auto; padding: 32px 16px 64px; }
+section { margin-bottom: 40px; }
+
+h2 { font-size: 1.25rem; font-weight: 800; color: var(--verde); border-left: 4px solid var(--verde-agua); padding-left: 14px; margin-bottom: 18px; scroll-margin-top: 72px; }
+h3 { font-size: 1rem; font-weight: 700; color: var(--carbon); margin: 22px 0 10px; }
+p { margin-bottom: 12px; }
+
+.pasos { list-style: none; padding: 0; }
+.pasos li { background: white; border: 1px solid var(--borde); border-radius: 10px; padding: 14px 16px 14px 58px; margin-bottom: 10px; position: relative; font-size: 15px; }
+.pasos li::before { content: attr(data-n); position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; background: var(--verde); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; }
+.pasos li strong { color: var(--carbon); }
+
+.caja { border-radius: 10px; padding: 16px 18px; margin: 16px 0; border-left: 4px solid; font-size: 15px; }
+.caja.info { background: #e8f5ee; border-color: var(--verde); }
+.caja.aviso { background: var(--amarillo); border-color: var(--amarillo-borde); }
+.caja.alerta { background: var(--rojo); border-color: var(--rojo-borde); }
+.caja strong { display: block; margin-bottom: 4px; font-weight: 700; }
+
+code { background: #eef0f4; padding: 2px 7px; border-radius: 4px; font-size: 0.88rem; font-family: monospace; }
+
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+th { background: var(--verde); color: white; padding: 10px 12px; text-align: left; }
+td { padding: 9px 12px; border-bottom: 1px solid var(--borde); }
+tr:nth-child(even) td { background: var(--fondo); }
+
+.glosario dt { font-weight: 700; color: var(--verde); margin-top: 14px; }
+.glosario dd { margin-left: 0; color: var(--muted); font-size: 0.93rem; margin-bottom: 4px; }
+
+/* Config inicial destacada */
+.config-inicial { background: var(--carbon); color: white; border-radius: 16px; padding: 32px; margin-bottom: 40px; }
+.config-badge { display: inline-block; background: var(--coral); color: white; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 16px; }
+.config-inicial h2 { color: white; border-left: 4px solid var(--coral); font-size: 1.4rem; margin-bottom: 12px; }
+.config-subtitulo { color: rgba(255,255,255,0.75); font-size: 1rem; margin-bottom: 24px; line-height: 1.6; }
+.config-subtitulo strong { color: white; }
+.config-pasos { list-style: none; padding: 0; margin: 0 0 24px; }
+.config-pasos li { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 16px 18px 16px 62px; margin-bottom: 10px; position: relative; color: white; }
+.config-pasos li::before { content: attr(data-n); position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: var(--coral); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; }
+.config-pasos li strong { color: white; }
+.config-pasos li span { color: rgba(255,255,255,0.7); font-size: 0.9rem; display: block; margin-top: 3px; }
+.config-ok { background: var(--verde); border-radius: 10px; padding: 14px 18px; color: white; font-weight: 600; font-size: 0.97rem; }
+
+/* Sub secciones de config */
+.sub-seccion { background: white; border: 2px solid var(--borde); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+.sub-seccion h3 { color: var(--verde); font-size: 1.05rem; border-bottom: 2px solid var(--fondo); padding-bottom: 10px; margin-bottom: 16px; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+.num-paso { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--verde); color: white; border-radius: 50%; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+
+/* Mockups */
+.mockup-sheet { background: white; border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; margin: 16px 0; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.mockup-sheet-header { background: #f8f9fa; border-bottom: 1px solid #dadce0; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
+.mockup-sheet-title { font-size: 14px; font-weight: 600; color: #3c4043; }
+.mockup-sheet-tabs { display: flex; border-bottom: 1px solid #dadce0; }
+.mockup-tab { padding: 6px 16px; font-size: 12px; cursor: pointer; border-right: 1px solid #dadce0; }
+.mockup-tab.active { background: white; color: var(--verde); font-weight: 700; border-bottom: 2px solid var(--verde); }
+.mockup-tab.inactive { background: #f8f9fa; color: #5f6368; }
+.mockup-cols { display: flex; border-bottom: 1px solid #dadce0; background: #f8f9fa; }
+.mockup-col-header { padding: 5px 8px; font-size: 10px; font-weight: 700; color: #5f6368; border-right: 1px solid #dadce0; min-width: 70px; text-align: center; }
+.mockup-row { display: flex; border-bottom: 1px solid #e8eaed; }
+.mockup-row-num { padding: 5px 8px; font-size: 10px; color: #5f6368; border-right: 1px solid #e8eaed; width: 30px; text-align: center; background: #f8f9fa; }
+.mockup-cell { padding: 5px 8px; font-size: 11px; border-right: 1px solid #e8eaed; min-width: 70px; white-space: nowrap; overflow: hidden; }
+.mockup-cell.header-cell { font-weight: 700; background: #e8f0fe; color: #1a73e8; }
+.mockup-cell.data { color: #3c4043; }
+
+.mockup-script { background: #1e1e1e; border-radius: 10px; padding: 16px; margin: 16px 0; font-family: monospace; font-size: 12px; color: #d4d4d4; overflow-x: auto; }
+.mockup-script .keyword { color: #569cd6; }
+.mockup-script .string { color: #ce9178; }
+.mockup-script .comment { color: #6a9955; }
+
+.mockup-implementar { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin: 16px 0; }
+.mockup-implementar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.btn-mock { display: inline-block; background: #1a73e8; color: white; font-size: 13px; font-weight: 600; padding: 8px 20px; border-radius: 4px; }
+.url-box { background: white; border: 1px solid #dadce0; border-radius: 6px; padding: 10px 14px; font-family: monospace; font-size: 11px; color: #1a73e8; word-break: break-all; margin-top: 8px; }
+.url-highlight { background: #e8f0fe; padding: 2px 0; }
+
+.mockup-config { background: white; border: 2px solid var(--borde); border-radius: 14px; overflow: hidden; margin: 16px 0; max-width: 360px; }
+.mockup-config-header { background: var(--verde); padding: 14px 16px; color: white; }
+.mockup-config-header h4 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.mockup-config-header p { font-size: 11px; opacity: 0.7; }
+.mockup-config-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.mockup-field { display: flex; flex-direction: column; gap: 3px; }
+.mockup-field label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.mockup-field input { background: var(--fondo); border: 1px solid var(--borde); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--carbon); }
+.mockup-field input.url-input { font-size: 11px; font-family: monospace; }
+.mockup-btn-guardar { background: var(--verde); color: white; border: none; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 700; width: 100%; margin-top: 4px; }
+
+/* Módulos grid */
+.modulos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin: 16px 0; }
+.mod-card { background: white; border: 1px solid var(--borde); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; }
+.mod-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--verde-agua); }
+.mod-card .icono { font-size: 1.6rem; }
+.mod-card .nombre { font-weight: 700; font-size: 0.95rem; }
+.mod-card .desc { font-size: 0.85rem; color: var(--muted); }
+
+/* Mockup celular home screen */
+.phones-row { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; margin: 20px 0; }
+.phone-demo { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.phone-demo-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.phone-mock { width: 160px; background: #1a1a2e; border-radius: 24px; padding: 8px; box-shadow: 0 16px 32px rgba(0,0,0,0.3); }
+.phone-mock-screen { background: #f0f0f0; border-radius: 18px; overflow: hidden; min-height: 260px; }
+.phone-mock-notch { width: 40px; height: 4px; background: #1a1a2e; border-radius: 2px; margin: 6px auto; }
+
+/* Android mockup */
+.android-status { background: #2d2d2d; padding: 4px 12px; display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.7); }
+.android-icons { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; padding: 16px 10px; background: #1a237e; }
+.android-icon { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.android-icon-img { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.android-icon span { font-size: 8px; color: white; text-align: center; }
+.android-dots { display: flex; justify-content: center; gap: 4px; padding: 8px; }
+.android-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+.android-dot.active { background: white; }
+
+/* iOS mockup */
+.ios-status { background: #1a2a38; padding: 4px 12px; display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.8); }
+.ios-icons { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; padding: 16px 10px; background: linear-gradient(180deg, #1a2a38 0%, #2d3a4a 100%); min-height: 180px; }
+.ios-icon { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.ios-icon-img { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.ios-icon span { font-size: 8px; color: white; text-align: center; font-weight: 500; }
+
+/* Código copiable */
+.code-block-wrapper { position: relative; margin: 16px 0; }
+.btn-copiar { position: absolute; top: 10px; right: 10px; background: var(--verde-agua); color: white; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; z-index: 2; }
+.btn-copiar:hover { background: var(--verde); }
+.btn-copiar.copiado { background: #27ae60; }
+.code-block { background: #1e1e1e; border-radius: 10px; padding: 20px 16px; font-family: monospace; font-size: 11.5px; color: #d4d4d4; overflow-x: auto; white-space: pre; line-height: 1.6; padding-top: 44px; }
+
+footer { background: var(--carbon); color: rgba(255,255,255,0.7); text-align: center; padding: 24px; font-size: 0.85rem; }
+footer strong { color: white; }
+
+@media (max-width: 520px) {
+  header h1 { font-size: 1.3rem; }
+  nav a { font-size: 12px; padding: 4px 10px; }
+  .pasos li { padding-left: 52px; }
+  .config-inicial { padding: 20px; }
+  .config-pasos li { padding-left: 54px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">
+    <svg width="36" height="36" viewBox="0 0 52 52" fill="none">
+      <rect x="4" y="30" width="12" height="18" rx="3" fill="#2EAF96"/>
+      <rect x="20" y="14" width="12" height="34" rx="3" fill="rgba(255,255,255,0.9)"/>
+      <rect x="36" y="22" width="12" height="26" rx="3" fill="#FF6B47"/>
+      <rect x="4" y="47" width="44" height="3" rx="1.5" fill="rgba(255,255,255,0.2)"/>
+    </svg>
+    <div class="header-wordmark">
+      <span>gestor</span>
+      <span>Base</span>
+    </div>
+  </div>
+  <h1>Guía de uso</h1>
+  <p>Plan Básico — Agenda, Gastos e Informes</p>
+</header>
+
+<nav>
+  <a href="#config">⚙️ Configuración</a>
+  <a href="#abrir">Cómo abrir</a>
+  <a href="#agenda">Agenda</a>
+  <a href="#gastos">Gastos</a>
+  <a href="#informes">Informes</a>
+  <a href="#personalizar">Personalizar</a>
+  <a href="#app-celular">📱 App en celular</a>
+  <a href="#problemas">Problemas</a>
+  <a href="#glosario">Glosario</a>
+</nav>
+
+<main>
+
+  <!-- CONFIGURACIÓN INICIAL -->
+  <div class="config-inicial" id="config">
+    <div class="config-badge">⚠️ Hacé esto primero</div>
+    <h2>Configuración inicial</h2>
+    <p class="config-subtitulo"><strong>Esta es la parte más importante de toda la guía.</strong> Sin esta configuración, GestorBase no puede guardar ni leer ningún dato. La hacés una sola vez y puede llevarte hasta 30 minutos. Después no necesitás volver a hacerlo nunca más.</p>
+    <ul class="config-pasos">
+      <li data-n="1"><strong>Crear tu planilla en Google Sheets</strong><span>Las pestañas donde se van a guardar todos tus datos</span></li>
+      <li data-n="2"><strong>Instalar el Apps Script</strong><span>El programa que conecta GestorBase con tu planilla</span></li>
+      <li data-n="3"><strong>Publicar el Apps Script y copiar tu URL</strong><span>Para que GestorBase pueda comunicarse con tu planilla</span></li>
+      <li data-n="4"><strong>Pegar tu URL en la pantalla de configuración</strong><span>El último paso — sin tocar ningún código</span></li>
+    </ul>
+    <div class="config-ok">✅ Una vez que terminés estos 4 pasos, GestorBase está listo para usar todos los días.</div>
+  </div>
+
+  <section id="config-detalle">
+
+    <div class="sub-seccion">
+      <h3><span class="num-paso">1</span> Crear tu planilla en Google Sheets</h3>
+      <ul class="pasos">
+        <li data-n="1">Abrí tu navegador y entrá a <strong>sheets.google.com</strong>. Iniciá sesión con tu cuenta de Google (Gmail).</li>
+        <li data-n="2">Hacé clic en el botón <strong>"+"</strong> para crear una planilla nueva.</li>
+        <li data-n="3">Arriba a la izquierda, donde dice "Hoja de cálculo sin título", hacé clic y escribí <strong>GestorBase</strong>.</li>
+        <li data-n="4">Abajo vas a ver una pestaña que dice <strong>"Hoja 1"</strong>. Hacé doble clic y cambiá el nombre a <strong>Agenda</strong>.</li>
+        <li data-n="5">Hacé clic en el <strong>"+"</strong> al lado de la pestaña para agregar más. Creá tres pestañas en total: Agenda, Gastos e Informes.</li>
+        <li data-n="6">En cada pestaña, escribí los títulos en la fila 1 (uno por columna) según la tabla de abajo.</li>
+      </ul>
+
+      <h3>Columnas de cada pestaña</h3>
+      <table>
+        <tr><th>Pestaña</th><th>Columnas (en orden, fila 1)</th></tr>
+        <tr><td><strong>Agenda</strong></td><td>Fecha, Hora, Cliente, Empleado, Servicio, Monto, Telefono, Notas, Timestamp, ID</td></tr>
+        <tr><td><strong>Gastos</strong></td><td>Fecha, Empleado, Descripcion, Categoria, Monto, Notas, Timestamp, ID</td></tr>
+        <tr><td><strong>Informes</strong></td><td>Fecha, Empleado, Cliente, Servicio, Monto, Notas, Timestamp, ID</td></tr>
+      </table>
+
+      <div class="caja aviso"><strong>⚠️ Los nombres tienen que ser exactos</strong>Escribilos tal como aparecen arriba, sin tildes y con mayúscula al principio. Si un nombre no coincide, el sistema no va a poder guardar los datos en esa columna.</div>
+
+      <p style="font-size:13px;color:var(--muted);margin-top:8px;">Así tiene que quedar la pestaña Agenda:</p>
+      <div class="mockup-sheet">
+        <div class="mockup-sheet-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="#0F9D58"/><path d="M7 8h10M7 12h10M7 16h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="mockup-sheet-title">GestorBase</span>
+        </div>
+        <div class="mockup-sheet-tabs">
+          <div class="mockup-tab active">Agenda</div>
+          <div class="mockup-tab inactive">Gastos</div>
+          <div class="mockup-tab inactive">Informes</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <div class="mockup-cols">
+            <div class="mockup-col-header" style="width:30px"></div>
+            <div class="mockup-col-header">A</div><div class="mockup-col-header">B</div><div class="mockup-col-header">C</div><div class="mockup-col-header">D</div><div class="mockup-col-header">E</div><div class="mockup-col-header">F</div><div class="mockup-col-header">G</div><div class="mockup-col-header">H</div>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-row-num">1</div>
+            <div class="mockup-cell header-cell">Fecha</div><div class="mockup-cell header-cell">Hora</div><div class="mockup-cell header-cell">Cliente</div><div class="mockup-cell header-cell">Empleado</div><div class="mockup-cell header-cell">Servicio</div><div class="mockup-cell header-cell">Monto</div><div class="mockup-cell header-cell">Telefono</div><div class="mockup-cell header-cell">Notas</div>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-row-num">2</div>
+            <div class="mockup-cell data" style="color:#aaa;font-style:italic;">2026-07-29</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">10:30</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Laura R.</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">María</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Corte</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">5000</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);margin-top:16px;">Así tiene que quedar la pestaña Gastos:</p>
+      <div class="mockup-sheet">
+        <div class="mockup-sheet-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="#0F9D58"/><path d="M7 8h10M7 12h10M7 16h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="mockup-sheet-title">GestorBase</span>
+        </div>
+        <div class="mockup-sheet-tabs">
+          <div class="mockup-tab inactive">Agenda</div>
+          <div class="mockup-tab active">Gastos</div>
+          <div class="mockup-tab inactive">Informes</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <div class="mockup-cols">
+            <div class="mockup-col-header" style="width:30px"></div>
+            <div class="mockup-col-header">A</div><div class="mockup-col-header">B</div><div class="mockup-col-header">C</div><div class="mockup-col-header">D</div><div class="mockup-col-header">E</div><div class="mockup-col-header">F</div><div class="mockup-col-header">G</div><div class="mockup-col-header">H</div>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-row-num">1</div>
+            <div class="mockup-cell header-cell">Fecha</div><div class="mockup-cell header-cell">Empleado</div><div class="mockup-cell header-cell">Descripcion</div><div class="mockup-cell header-cell">Categoria</div><div class="mockup-cell header-cell">Monto</div><div class="mockup-cell header-cell">Notas</div><div class="mockup-cell header-cell">Timestamp</div><div class="mockup-cell header-cell">ID</div>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-row-num">2</div>
+            <div class="mockup-cell data" style="color:#aaa;font-style:italic;">2026-07-29</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">María</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Tinte</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Insumos</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">1200</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);margin-top:16px;">Así tiene que quedar la pestaña Informes:</p>
+      <div class="mockup-sheet">
+        <div class="mockup-sheet-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="#0F9D58"/><path d="M7 8h10M7 12h10M7 16h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="mockup-sheet-title">GestorBase</span>
+        </div>
+        <div class="mockup-sheet-tabs">
+          <div class="mockup-tab inactive">Agenda</div>
+          <div class="mockup-tab inactive">Gastos</div>
+          <div class="mockup-tab active">Informes</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <div class="mockup-cols">
+            <div class="mockup-col-header" style="width:30px"></div>
+            <div class="mockup-col-header">A</div><div class="mockup-col-header">B</div><div class="mockup-col-header">C</div><div class="mockup-col-header">D</div><div class="mockup-col-header">E</div><div class="mockup-col-header">F</div><div class="mockup-col-header">G</div><div class="mockup-col-header">H</div>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-row-num">1</div>
+            <div class="mockup-cell header-cell">Fecha</div><div class="mockup-cell header-cell">Empleado</div><div class="mockup-cell header-cell">Cliente</div><div class="mockup-cell header-cell">Servicio</div><div class="mockup-cell header-cell">Monto</div><div class="mockup-cell header-cell">Notas</div><div class="mockup-cell header-cell">Timestamp</div><div class="mockup-cell header-cell">ID</div>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-row-num">2</div>
+            <div class="mockup-cell data" style="color:#aaa;font-style:italic;">2026-07-29</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">María</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Laura R.</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Corte</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">5000</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-seccion">
+      <h3><span class="num-paso">2</span> Instalar el Apps Script</h3>
+      <ul class="pasos">
+        <li data-n="1">En tu planilla, andá al menú <strong>Extensiones → Apps Script</strong>. Se va a abrir una pantalla nueva con un editor de código.</li>
+        <li data-n="2">Seleccioná todo el código que hay adentro (<strong>Ctrl + A</strong>) y borralo (<strong>Suprimir</strong>).</li>
+        <li data-n="3">Copiá el código que está más abajo usando el botón <strong>"Copiar"</strong>.</li>
+        <li data-n="4">Pegalo en el editor (<strong>Ctrl + V</strong>).</li>
+        <li data-n="5">Guardá con <strong>Ctrl + S</strong>. Si te pide un nombre para el proyecto, escribí <strong>GestorBase</strong>.</li>
+      </ul>
+
+      <p style="font-size:13px;color:var(--muted);margin-top:8px;">Copiá este código completo y pegalo en el editor:</p>
+      <div class="code-block-wrapper">
+        <button class="btn-copiar" onclick="copiarCodigo()">Copiar</button>
+        <pre class="code-block" id="apps-script-code">// GestorBase — Apps Script
+// Copiá TODO este código en tu editor de Apps Script
+
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(data.tabla);
+
+    if (!sheet) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ok: false, error: 'Pestaña no encontrada: ' + data.tabla}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (data.accion === 'guardar') {
+      var id = new Date().getTime().toString();
+      var timestamp = new Date().toISOString();
+      data.fila.push(timestamp);
+      data.fila.push(id);
+      sheet.appendRow(data.fila);
+      return ContentService
+        .createTextOutput(JSON.stringify({ok: true, id: id}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (data.accion === 'borrar') {
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var lastCol = rows[i].length - 1;
+        if (String(rows[i][lastCol]) === String(data.id)) {
+          sheet.deleteRow(i + 1);
+          return ContentService
+            .createTextOutput(JSON.stringify({ok: true}))
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      return ContentService
+        .createTextOutput(JSON.stringify({ok: false, error: 'Registro no encontrado'}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ok: false, error: 'Accion desconocida'}))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ok: false, error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var tabla = e.parameter.tabla;
+    var sheet = ss.getSheetByName(tabla);
+
+    if (!sheet) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ok: false, error: 'Pestaña no encontrada: ' + tabla}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    var rows = [];
+
+    for (var i = 1; i < data.length; i++) {
+      var row = {};
+      for (var j = 0; j < headers.length; j++) {
+        row[headers[j]] = data[i][j];
+      }
+      rows.push(row);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ok: true, datos: rows}))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ok: false, error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
+      </div>
+
+      <div class="caja info" style="margin-top:8px;"><strong>✅ Una vez pegado el código, guardá con Ctrl + S</strong>Si el editor te pide un nombre para el proyecto, escribí <strong>GestorBase</strong> y aceptá. El editor va a mostrar el código completo con scroll — eso es normal. <strong>No cierres el editor</strong> — el siguiente paso se hace desde acá mismo.</div>
+    </div>
+
+    <div class="sub-seccion">
+      <h3><span class="num-paso">3</span> Publicar el Apps Script y obtener tu URL</h3>
+      <p style="margin-bottom:14px;">Sin cerrar el editor, hacé clic en el botón azul <strong>"Implementar"</strong> que aparece arriba a la derecha.</p>
+      <ul class="pasos">
+        <li data-n="1">Hacé clic en el botón azul <strong>"Implementar"</strong> que está arriba a la derecha.</li>
+        <li data-n="2">Elegí <strong>"Nueva implementación"</strong>.</li>
+        <li data-n="3">Al lado de "Tipo", hacé clic en el ícono del engranaje ⚙️ y elegí <strong>"Aplicación web"</strong>.</li>
+        <li data-n="4">En el campo "Quién tiene acceso" elegí <strong>"Cualquier usuario"</strong>.</li>
+        <li data-n="5">Hacé clic en <strong>"Implementar"</strong>.</li>
+        <li data-n="6">Google te va a pedir que autorices el acceso. Hacé clic en <strong>"Autorizar acceso"</strong>, elegí tu cuenta de Google y aceptá todo.</li>
+        <li data-n="7">Al final vas a ver una URL larga. <strong>Copiala y guardala</strong> — la vas a necesitar en el paso 4.</li>
+      </ul>
+
+      <div class="mockup-implementar">
+        <div class="mockup-implementar-header">
+          <span style="font-size:13px;font-weight:600;color:#3c4043;">Nueva implementación</span>
+          <span class="btn-mock">Implementar</span>
+        </div>
+        <div style="font-size:12px;color:#5f6368;margin-bottom:8px;">URL de la aplicación web:</div>
+        <div class="url-box"><span class="url-highlight">https://script.google.com/macros/s/AKfycb<strong>TU_URL_ÚNICA</strong>xxx/exec</span></div>
+        <div style="font-size:11px;color:#e63946;margin-top:8px;font-weight:600;">⚠️ Copiá esta URL antes de cerrar la pantalla</div>
+      </div>
+
+      <div class="caja aviso"><strong>⚠️ No cierres esta pantalla sin copiar la URL</strong>Si la cerrás, podés volver a obtenerla desde Implementar → Administrar implementaciones.</div>
+    </div>
+
+    <div class="sub-seccion">
+      <h3><span class="num-paso">4</span> Pegar la URL en la pantalla de configuración</h3>
+      <ul class="pasos">
+        <li data-n="1">Abrí el link de tu sistema que recibiste por email.</li>
+        <li data-n="2">La primera vez que lo abrís aparece automáticamente la pantalla de configuración.</li>
+        <li data-n="3">Completá el nombre de tu negocio, elegí tus colores y cargá tus empleados.</li>
+        <li data-n="4">En el campo <strong>"URL de tu Google Sheet"</strong>, pegá la URL que copiaste en el paso anterior.</li>
+        <li data-n="5">Hacé clic en <strong>"Guardar configuración"</strong>.</li>
+      </ul>
+
+      <div class="caja info"><strong>✅ ¡Listo!</strong>La configuración se guarda en el celular o computadora donde la hiciste. Si abrís el sistema desde otro dispositivo, vas a tener que repetir este paso en ese dispositivo.</div>
+
+      <p style="font-size:13px;color:var(--muted);margin-top:16px;">Así se ve la pantalla de configuración:</p>
+      <div class="mockup-config">
+        <div class="mockup-config-header">
+          <h4>⚙️ Configuración de GestorBase</h4>
+          <p>Completá estos datos para personalizar tu sistema</p>
+        </div>
+        <div class="mockup-config-body">
+          <div class="mockup-field"><label>Nombre del negocio</label><input type="text" value="Peluquería Valeria" readonly></div>
+          <div class="mockup-field"><label>Color principal</label><input type="text" value="#1B6F5F" readonly></div>
+          <div class="mockup-field"><label>Empleados (separados por coma)</label><input type="text" value="María, Sofía, Juan" readonly></div>
+          <div class="mockup-field"><label>URL de tu Google Sheet</label><input type="text" class="url-input" value="https://script.google.com/macros/s/..." readonly></div>
+          <button class="mockup-btn-guardar">Guardar configuración</button>
+        </div>
+      </div>
+
+      <div class="caja aviso"><strong>⚠️ Si necesitás cambiar algo después</strong>Tocá el ícono ⚙️ que aparece en cualquier módulo para volver a abrir la pantalla de configuración.</div>
+    </div>
+
+  </section>
+
+  <!-- CÓMO ABRIR -->
+  <section id="abrir">
+    <h2>Cómo abrir tu sistema</h2>
+    <p>Recibiste un link (o varios) por email. Ese link es tu sistema. No hay archivos que descargar ni instalar.</p>
+    <ul class="pasos">
+      <li data-n="1">Abrí el email que recibiste de GestorBase.</li>
+      <li data-n="2">Tocá o hacé clic en el link de tu plan Básico.</li>
+      <li data-n="3">Se abre directamente en el navegador — Chrome, Safari, Firefox, el que uses.</li>
+      <li data-n="4">Si es la primera vez, aparece la pantalla de configuración. Si ya configuraste, entra directo al sistema.</li>
+    </ul>
+    <div class="caja info"><strong>💡 Guardá el link</strong>Guardalo en favoritos del navegador o agregalo a la pantalla de inicio del celular (ver sección "App en celular" más abajo).</div>
+
+    <h3>Módulos de tu plan</h3>
+    <div class="modulos-grid">
+      <div class="mod-card"><div class="icono">📅</div><div class="nombre">Agenda</div><div class="desc">Registrá y organizá todos los turnos</div></div>
+      <div class="mod-card"><div class="icono">💰</div><div class="nombre">Gastos</div><div class="desc">Controlá ingresos y egresos del negocio</div></div>
+      <div class="mod-card"><div class="icono">📋</div><div class="nombre">Informes</div><div class="desc">Registrá el trabajo diario por empleado</div></div>
+    </div>
+  </section>
+
+  <!-- AGENDA -->
+  <section id="agenda">
+    <h2>📅 Agenda — Gestión de turnos</h2>
+    <p>Con este módulo cargás todos los turnos: cliente, empleado, servicio, horario y monto.</p>
+    <h3>Cargar un turno nuevo</h3>
+    <ul class="pasos">
+      <li data-n="1">Abrí el módulo Agenda desde el link o desde el menú de inicio.</li>
+      <li data-n="2">Completá todos los campos: fecha, hora, nombre del cliente, empleado, servicio, monto, teléfono y notas.</li>
+      <li data-n="3">Hacé clic en <strong>"Guardar turno"</strong>.</li>
+      <li data-n="4">Vas a ver un mensaje de confirmación. El turno queda guardado en tu planilla automáticamente.</li>
+    </ul>
+    <h3>Ver los turnos del día</h3>
+    <p>En la parte de abajo de la pantalla vas a ver la lista de turnos del día actual. Tocá otro día del calendario para ver los turnos de esa fecha.</p>
+    <h3>Borrar un turno</h3>
+    <ul class="pasos">
+      <li data-n="1">Buscá el turno en la lista.</li>
+      <li data-n="2">Tocá el botón <strong>"Borrar"</strong>.</li>
+      <li data-n="3">Confirmá. El turno se elimina de la planilla.</li>
+    </ul>
+    <div class="caja aviso"><strong>⚠️ El borrado es definitivo</strong>Una vez que borrás un turno no se puede recuperar. Si te equivocaste, podés volver a cargarlo.</div>
+    <table>
+      <tr><th>Campo</th><th>Qué poner</th><th>Obligatorio</th></tr>
+      <tr><td>Fecha</td><td>El día del turno</td><td>Sí</td></tr>
+      <tr><td>Hora</td><td>Horario del turno (ej: 10:30)</td><td>Sí</td></tr>
+      <tr><td>Cliente</td><td>Nombre y apellido del cliente</td><td>Sí</td></tr>
+      <tr><td>Empleado</td><td>Quién realizó el servicio</td><td>Sí</td></tr>
+      <tr><td>Servicio</td><td>Qué servicio se realizó</td><td>Sí</td></tr>
+      <tr><td>Monto</td><td>Lo que cobró (solo números, sin $)</td><td>Sí</td></tr>
+      <tr><td>Teléfono</td><td>Número del cliente</td><td>No</td></tr>
+      <tr><td>Notas</td><td>Cualquier aclaración extra</td><td>No</td></tr>
+    </table>
+  </section>
+
+  <!-- GASTOS -->
+  <section id="gastos">
+    <h2>💰 Gastos — Registro de egresos</h2>
+    <p>Registrá todos los gastos del negocio: materiales, insumos, servicios, alquiler, lo que necesites. Los ingresos se registran desde la Agenda al cargar cada turno.</p>
+    <ul class="pasos">
+      <li data-n="1">Abrí el módulo Gastos.</li>
+      <li data-n="2">Completá la fecha, descripción, categoría y monto del gasto.</li>
+      <li data-n="3">Hacé clic en <strong>"Guardar"</strong>. El registro queda en tu planilla al instante.</li>
+    </ul>
+    <p>Para borrar un registro, tocá el botón <strong>"Borrar"</strong> al lado del ítem en la lista.</p>
+    <div class="caja info"><strong>💡 Tip</strong>Usá siempre la misma palabra para cada categoría (por ejemplo: siempre "Insumos" y no a veces "insumos" o "material"). Así los informes quedan más claros.</div>
+  </section>
+
+  <!-- INFORMES -->
+  <section id="informes">
+    <h2>📊 Informes — Resumen del mes</h2>
+    <p>El módulo Informes no es para cargar datos — es para <strong>ver el resumen del mes</strong>. Muestra todo lo que pasó en el período que elegís: ingresos, gastos y balance.</p>
+    <ul class="pasos">
+      <li data-n="1">Abrí el módulo Informes.</li>
+      <li data-n="2">Elegí el <strong>mes</strong> y el <strong>año</strong> que querés consultar.</li>
+      <li data-n="3">Tocá <strong>"Buscar"</strong>.</li>
+      <li data-n="4">Vas a ver cuatro tarjetas: <strong>Ingresos</strong> (total de turnos cobrados), <strong>Gastos</strong> (total de egresos), <strong>Balance</strong> (diferencia) y <strong>Turnos</strong> (cantidad).</li>
+      <li data-n="5">Más abajo aparece el detalle de cada turno y cada gasto del período.</li>
+    </ul>
+    <div class="caja info"><strong>💡 ¿De dónde salen los datos?</strong>Los ingresos vienen de los turnos cargados en la <strong>Agenda</strong>. Los gastos vienen del módulo <strong>Gastos</strong>. No hay nada que cargar en Informes — solo consultás.</div>
+  </section>
+
+  <!-- PERSONALIZAR -->
+  <section id="personalizar">
+    <h2>⚙️ Personalizá tu sistema</h2>
+    <p>En cualquier momento podés cambiar el nombre de tu negocio, los colores, la lista de empleados y las categorías de gastos.</p>
+    <h3>Cómo abrir la configuración</h3>
+    <ul class="pasos">
+      <li data-n="1">Abrí cualquier módulo de tu sistema.</li>
+      <li data-n="2">Tocá el ícono <strong>⚙️</strong> que aparece en la esquina de la pantalla.</li>
+      <li data-n="3">Se abre la pantalla de configuración con todos tus datos actuales.</li>
+      <li data-n="4">Cambiá lo que necesitás y tocá <strong>"Guardar configuración"</strong>.</li>
+    </ul>
+    <div class="caja aviso"><strong>⚠️ La configuración se guarda en el dispositivo</strong>Si abrís el sistema desde otro celular o computadora, vas a tener que volver a configurarlo en ese dispositivo. La URL del Sheet solo la tenés que pegar una vez por dispositivo.</div>
+
+    <h3>Qué podés personalizar</h3>
+    <table>
+      <tr><th>Campo</th><th>Qué hace</th><th>Ejemplo</th></tr>
+      <tr><td><strong>Nombre del negocio</strong></td><td>Aparece en el encabezado de todos los módulos</td><td>Peluquería Sol</td></tr>
+      <tr><td><strong>Color principal</strong></td><td>Color del encabezado y botones principales</td><td>#1B6F5F</td></tr>
+      <tr><td><strong>Color acento</strong></td><td>Color de detalles y acentos</td><td>#2EAF96</td></tr>
+      <tr><td><strong>Empleados</strong></td><td>Lista que aparece al cargar un turno o gasto</td><td>María, Juan, Sofía</td></tr>
+      <tr><td><strong>Categorías de gastos</strong></td><td>Opciones del menú de categorías</td><td>Insumos, Alquiler, Servicios</td></tr>
+      <tr><td><strong>URL del Sheet</strong></td><td>La dirección de tu planilla de Google</td><td>https://script.google.com/...</td></tr>
+    </table>
+    <div class="caja info"><strong>💡 Para elegir un color</strong>Entrá a <strong>htmlcolorcodes.com</strong>, elegí el que te guste y copiá el código que empieza con #.</div>
+  </section>
+
+  <!-- APP EN CELULAR -->
+  <section id="app-celular">
+    <h2>📱 Bonus — Tu sistema en la pantalla de inicio</h2>
+    <p>Podés agregar GestorBase a la pantalla de inicio de tu celular. Se va a ver y abrir igual que una app, con el ícono de GestorBase, sin instalar nada ni pagar ninguna tienda.</p>
+    <div class="caja info"><strong>💡 ¿Qué necesitás?</strong>Solo tu celular y el link de tu sistema. Nada más.</div>
+
+    <h3>En iPhone (Safari)</h3>
+    <ul class="pasos">
+      <li data-n="1">Abrí el link de tu sistema en <strong>Safari</strong> (no funciona desde Chrome en iPhone para esta función).</li>
+      <li data-n="2">Tocá el ícono de <strong>compartir</strong> — el cuadrado con una flecha hacia arriba, abajo en el centro de la pantalla.</li>
+      <li data-n="3">Deslizá hacia abajo en el menú y tocá <strong>"Agregar a pantalla de inicio"</strong>.</li>
+      <li data-n="4">Escribí el nombre que querés (por ejemplo <strong>Mi Sistema</strong>) y tocá <strong>Agregar</strong> arriba a la derecha.</li>
+      <li data-n="5">¡Listo! El ícono de GestorBase aparece en tu pantalla de inicio.</li>
+    </ul>
+
+    <div class="phones-row">
+      <div class="phone-demo">
+        <div class="phone-mock">
+          <div class="phone-mock-screen">
+            <div class="phone-mock-notch"></div>
+            <div class="ios-status"><span>9:41</span><span>●●●</span></div>
+            <div class="ios-icons">
+              <div class="ios-icon">
+                <div class="ios-icon-img" style="background:#1B6F5F;box-shadow:0 0 0 2px #2EAF96;">
+                  <svg width="22" height="22" viewBox="0 0 52 52" fill="none"><rect x="4" y="30" width="12" height="18" rx="3" fill="#2EAF96"/><rect x="20" y="14" width="12" height="34" rx="3" fill="rgba(255,255,255,0.9)"/><rect x="36" y="22" width="12" height="26" rx="3" fill="#FF6B47"/></svg>
+                </div>
+                <span style="font-weight:700;">Mi Sistema</span>
+              </div>
+              <div class="ios-icon"><div class="ios-icon-img" style="background:#2c5364;">📷</div><span>Cámara</span></div>
+              <div class="ios-icon"><div class="ios-icon-img" style="background:#1e3a2f;">💬</div><span>Mensajes</span></div>
+              <div class="ios-icon"><div class="ios-icon-img" style="background:#25d366;">📱</div><span>WhatsApp</span></div>
+              <div class="ios-icon"><div class="ios-icon-img" style="background:#2c3e50;">📧</div><span>Mail</span></div>
+              <div class="ios-icon"><div class="ios-icon-img" style="background:#8e44ad;">🎵</div><span>Música</span></div>
+            </div>
+          </div>
+        </div>
+        <span class="phone-demo-label">iPhone</span>
+      </div>
+    </div>
+
+    <h3>En Android (Chrome)</h3>
+    <ul class="pasos">
+      <li data-n="1">Abrí el link de tu sistema en <strong>Chrome</strong>.</li>
+      <li data-n="2">Tocá los <strong>tres puntitos</strong> que aparecen arriba a la derecha.</li>
+      <li data-n="3">Elegí <strong>"Agregar a pantalla de inicio"</strong> o <strong>"Instalar app"</strong> (depende de la versión de Chrome).</li>
+      <li data-n="4">Poné el nombre que querés (por ejemplo <strong>Mi Sistema</strong>) y tocá <strong>Agregar</strong>.</li>
+      <li data-n="5">¡Listo! El ícono aparece en tu pantalla de inicio como una app.</li>
+    </ul>
+
+    <div class="phones-row">
+      <div class="phone-demo">
+        <div class="phone-mock">
+          <div class="phone-mock-screen" style="background:#1a237e;">
+            <div class="android-status"><span>9:41</span><span>●●● 🔋</span></div>
+            <div class="android-icons">
+              <div class="android-icon">
+                <div class="android-icon-img" style="background:#1B6F5F;box-shadow:0 0 0 2px #2EAF96;">
+                  <svg width="22" height="22" viewBox="0 0 52 52" fill="none"><rect x="4" y="30" width="12" height="18" rx="3" fill="#2EAF96"/><rect x="20" y="14" width="12" height="34" rx="3" fill="rgba(255,255,255,0.9)"/><rect x="36" y="22" width="12" height="26" rx="3" fill="#FF6B47"/></svg>
+                </div>
+                <span style="font-weight:700;">Mi Sistema</span>
+              </div>
+              <div class="android-icon"><div class="android-icon-img" style="background:#25d366;">📱</div><span>WhatsApp</span></div>
+              <div class="android-icon"><div class="android-icon-img" style="background:#1e3a2f;">💬</div><span>Mensajes</span></div>
+              <div class="android-icon"><div class="android-icon-img" style="background:#8e44ad;">🎵</div><span>Música</span></div>
+              <div class="android-icon"><div class="android-icon-img" style="background:#2c5364;">📷</div><span>Cámara</span></div>
+              <div class="android-icon"><div class="android-icon-img" style="background:#2c3e50;">📧</div><span>Email</span></div>
+            </div>
+            <div class="android-dots">
+              <div class="android-dot active"></div>
+              <div class="android-dot"></div>
+              <div class="android-dot"></div>
+            </div>
+          </div>
+        </div>
+        <span class="phone-demo-label">Android</span>
+      </div>
+    </div>
+
+    <div class="caja aviso"><strong>⚠️ Recordá</strong>Necesitás conexión a internet para que los datos se carguen y guarden correctamente.</div>
+  </section>
+
+  <!-- PROBLEMAS -->
+  <section id="problemas">
+    <h2>🛠 ¿Algo no funciona? Soluciones paso a paso</h2>
+
+    <h3>Los datos aparecen en $0 o el módulo está vacío</h3>
+    <div class="caja alerta"><strong>Causa más común: la URL del Sheet no está configurada</strong>Revisá que hayas pegado la URL correctamente en la pantalla de configuración (⚙️).</div>
+    <ul class="pasos">
+      <li data-n="1">Tocá el ícono ⚙️ para abrir la configuración.</li>
+      <li data-n="2">Verificá que el campo "URL de tu Google Sheet" tenga la URL completa.</li>
+      <li data-n="3">Si está vacío o incompleto, pegá la URL nuevamente y guardá.</li>
+      <li data-n="4">Si la URL está bien, verificá que tengas conexión a internet.</li>
+    </ul>
+
+    <h3>Guardé un dato pero no aparece en la lista</h3>
+    <ul class="pasos">
+      <li data-n="1">Cerrá el módulo y volvé a abrirlo. Los datos se recargan al abrir.</li>
+      <li data-n="2">Abrí tu planilla de Google Sheets directamente para verificar si el dato llegó.</li>
+      <li data-n="3">Si no está en la planilla, volvé a cargarlo.</li>
+    </ul>
+
+    <h3>La pantalla de configuración no aparece más</h3>
+    <p>La configuración solo aparece automáticamente la primera vez. Para volver a abrirla en cualquier momento, tocá el ícono <strong>⚙️</strong> en cualquier módulo.</p>
+
+    <h3>El link no abre o da error</h3>
+    <ul class="pasos">
+      <li data-n="1">Verificá que tenés conexión a internet.</li>
+      <li data-n="2">Probá abrirlo en otro navegador (Chrome, Safari, Firefox).</li>
+      <li data-n="3">Si el error persiste, copiá el link completo desde el email y pegalo en la barra de direcciones del navegador.</li>
+    </ul>
+
+    <div class="caja info"><strong>💡 Recordá</strong>Tu planilla de Google Sheets es donde viven todos tus datos. Podés abrirla desde drive.google.com para revisar o corregir información directamente.</div>
+  </section>
+
+  <!-- GLOSARIO -->
+  <section id="glosario">
+    <h2>📖 Glosario — Palabras técnicas explicadas</h2>
+    <dl class="glosario">
+      <dt>Google Sheets</dt>
+      <dd>Es la planilla donde se guardan todos tus datos. Funciona como Excel pero en internet, dentro de tu cuenta de Google.</dd>
+      <dt>Apps Script</dt>
+      <dd>Es un programa invisible que conecta GestorBase con tu planilla. Lo instalás una sola vez y se encarga de recibir y guardar todos los datos automáticamente.</dd>
+      <dt>URL del Apps Script</dt>
+      <dd>Es la dirección web única que genera Google cuando publicás el Apps Script. GestorBase la necesita para saber dónde enviar los datos.</dd>
+      <dt>Configuración</dt>
+      <dd>Pantalla donde personalizás tu sistema: nombre del negocio, colores, empleados, categorías y URL del Sheet. Se abre automáticamente la primera vez y después con el ícono ⚙️.</dd>
+      <dt>LocalStorage</dt>
+      <dd>Lugar del navegador donde GestorBase guarda tu configuración. Por eso la configuración queda guardada aunque cierres el navegador, pero si cambiás de dispositivo tenés que volver a configurar.</dd>
+      <dt>Link</dt>
+      <dd>La dirección web de tu sistema. Es lo que recibiste por email. Es único para tu plan.</dd>
+      <dt>Timestamp</dt>
+      <dd>Fecha y hora exacta en que se guardó un registro. Lo genera automáticamente el sistema.</dd>
+      <dt>ID</dt>
+      <dd>Número único que GestorBase asigna automáticamente a cada registro. Lo usa para saber qué borrar cuando eliminás un turno o gasto.</dd>
+    </dl>
+  </section>
+
+</main>
+
+<footer>
+  <strong>GestorBase</strong> — Plan Básico<br>
+  Agenda · Gastos · Informes
+</footer>
+
+<script>
+function copiarCodigo() {
+  var code = document.getElementById('apps-script-code').textContent;
+  var btn = document.querySelector('.btn-copiar');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(function() {
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('copiado');
+      setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copiado'); }, 2500);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = code;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copiado');
+    setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copiado'); }, 2500);
+  }
+}
+</script>
+
+</body>
+</html>
