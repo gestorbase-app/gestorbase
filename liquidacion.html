@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -26,11 +26,17 @@ header span { font-size: 0.8rem; opacity: .75; }
 .mes-selector select { flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
 .mes-selector select:focus { outline: none; border-color: var(--accent); }
 .btn-ver { padding: 9px 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
-.config-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,.07); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-.config-card label { font-size: 0.85rem; font-weight: 600; color: var(--muted); flex: 1; }
-.config-card input { width: 80px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem; font-weight: 700; text-align: center; }
-.config-card input:focus { outline: none; border-color: var(--accent); }
-.config-card span { font-size: 1rem; font-weight: 700; color: var(--muted); }
+.modalidad-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,.07); margin-bottom: 16px; }
+.modalidad-titulo { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+.modalidad-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.btn-modalidad { padding: 10px 6px; border: 2px solid var(--border); border-radius: 10px; background: var(--gray); font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer; text-align: center; touch-action: manipulation; transition: all .15s; line-height: 1.3; }
+.btn-modalidad.activo { border-color: var(--accent); background: #eef3ff; color: var(--accent); }
+.monto-input-row { display: flex; align-items: center; gap: 10px; }
+.monto-input-row label { font-size: 0.85rem; font-weight: 600; color: var(--muted); flex: 1; }
+.monto-input-row .prefijo { font-size: 1rem; font-weight: 700; color: var(--muted); }
+.monto-input-row input { width: 130px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem; font-weight: 700; text-align: right; }
+.monto-input-row input:focus { outline: none; border-color: var(--accent); }
+.monto-input-row .sufijo { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
 .empleado-card { background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 1px 6px rgba(0,0,0,.07); margin-bottom: 14px; }
 .empleado-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .empleado-nombre { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -53,7 +59,6 @@ header span { font-size: 0.8rem; opacity: .75; }
 .total-card .monto { font-size: 1.9rem; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.9rem; }
 .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
-/* Config screen */
 #config-screen { display: none; position: fixed; inset: 0; background: var(--gray); z-index: 200; overflow-y: auto; padding: 24px 16px; }
 #config-screen.visible { display: block; }
 #config-screen h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
@@ -71,7 +76,6 @@ header span { font-size: 0.8rem; opacity: .75; }
 </head>
 <body ontouchstart="">
 
-<!-- Pantalla de configuración -->
 <div id="config-screen">
   <div class="config-logo">💼</div>
   <h2>Configuración de Liquidación</h2>
@@ -115,11 +119,34 @@ header span { font-size: 0.8rem; opacity: .75; }
     <select id="sel-mes"></select>
     <button class="btn-ver" id="btn-calcular">Calcular</button>
   </div>
-  <div class="config-card">
-    <label>% de comisión por turno</label>
-    <input type="number" id="inp-comision" min="0" max="100" value="50">
-    <span>%</span>
+
+  <div class="modalidad-card">
+    <div class="modalidad-titulo">Modalidad de pago</div>
+    <div class="modalidad-btns">
+      <button class="btn-modalidad" data-mod="comision" onclick="selModalidad('comision')">% Comisión</button>
+      <button class="btn-modalidad" data-mod="semanal" onclick="selModalidad('semanal')">Sueldo<br>semanal</button>
+      <button class="btn-modalidad" data-mod="mensual" onclick="selModalidad('mensual')">Sueldo<br>mensual</button>
+    </div>
+
+    <div id="panel-comision" class="monto-input-row">
+      <label>% de comisión por turno</label>
+      <input type="number" id="inp-comision" min="0" max="100" value="50">
+      <span class="sufijo">%</span>
+    </div>
+
+    <div id="panel-semanal" class="monto-input-row" style="display:none">
+      <label>Sueldo por semana</label>
+      <span class="prefijo">$</span>
+      <input type="number" id="inp-semanal" min="0" value="0">
+    </div>
+
+    <div id="panel-mensual" class="monto-input-row" style="display:none">
+      <label>Sueldo mensual fijo</label>
+      <span class="prefijo">$</span>
+      <input type="number" id="inp-mensual" min="0" value="0">
+    </div>
   </div>
+
   <div id="resultado">
     <div class="empty-state">
       <div class="icon">💼</div>
@@ -136,7 +163,10 @@ var CONFIG_DEFAULT = {
   colorAccent: '#0057d9',
   urlSheet: '',
   empleados: ['Empleado 1', 'Empleado 2', 'Empleado 3'],
-  porcentajeComision: 50
+  porcentajeComision: 50,
+  modalidadPago: 'comision',
+  sueldoSemanal: 0,
+  sueldoMensual: 0
 };
 var savedConfig = {};
 try { savedConfig = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch(e) {}
@@ -147,6 +177,19 @@ for (var ki = 0; ki < keys.length; ki++) {
 }
 
 var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var modalidadActual = CONFIG.modalidadPago || 'comision';
+var yaCalculado = false;
+
+function selModalidad(mod) {
+  modalidadActual = mod;
+  document.querySelectorAll('.btn-modalidad').forEach(function(b) {
+    b.classList.toggle('activo', b.dataset.mod === mod);
+  });
+  document.getElementById('panel-comision').style.display = mod === 'comision' ? 'flex' : 'none';
+  document.getElementById('panel-semanal').style.display  = mod === 'semanal'  ? 'flex' : 'none';
+  document.getElementById('panel-mensual').style.display  = mod === 'mensual'  ? 'flex' : 'none';
+  if (yaCalculado) calcular();
+}
 
 function aplicarConfig() {
   document.documentElement.style.setProperty('--blue', CONFIG.colorPrincipal);
@@ -154,6 +197,9 @@ function aplicarConfig() {
   document.getElementById('page-title').textContent = 'Liquidación — ' + CONFIG.negocio;
   document.getElementById('header-negocio').textContent = CONFIG.negocio;
   document.getElementById('inp-comision').value = CONFIG.porcentajeComision || 50;
+  document.getElementById('inp-semanal').value  = CONFIG.sueldoSemanal || 0;
+  document.getElementById('inp-mensual').value  = CONFIG.sueldoMensual || 0;
+  selModalidad(modalidadActual);
   var sel = document.getElementById('sel-mes');
   sel.innerHTML = '';
   var hoy = new Date();
@@ -165,6 +211,9 @@ function aplicarConfig() {
     op.textContent = MESES[d.getMonth()] + ' ' + d.getFullYear();
     sel.appendChild(op);
   }
+  sel.addEventListener('change', function() {
+    if (yaCalculado) calcular();
+  });
 }
 
 function abrirConfig() {
@@ -198,37 +247,40 @@ document.getElementById('btn-guardar-config').addEventListener('click', function
     colorAccent: document.getElementById('cfg-color2').value,
     empleados: empleados,
     categorias: savedConfig.categorias || ['Insumos','Servicios','Sueldos','Alquiler','Mantenimiento','Otros'],
-    porcentajeComision: parseInt(document.getElementById('inp-comision').value) || 50
+    porcentajeComision: parseInt(document.getElementById('inp-comision').value) || 50,
+    modalidadPago: modalidadActual,
+    sueldoSemanal: parseFloat(document.getElementById('inp-semanal').value) || 0,
+    sueldoMensual: parseFloat(document.getElementById('inp-mensual').value) || 0
   };
   try { localStorage.setItem(CONFIG_KEY, JSON.stringify(nuevaConfig)); } catch(e) {}
   location.reload();
 });
 
-document.getElementById('btn-abrir-config').addEventListener('click', function() {
-  abrirConfig();
-});
+document.getElementById('btn-abrir-config').addEventListener('click', abrirConfig);
+document.getElementById('btn-calcular').addEventListener('click', calcular);
 
-document.getElementById('btn-calcular').addEventListener('click', function() {
-  calcular();
-});
-
-if (!savedConfig.negocio) {
-  abrirConfig();
-}
-
+if (!savedConfig.negocio) abrirConfig();
 aplicarConfig();
 
 function calcular() {
+  yaCalculado = true;
   var mes = document.getElementById('sel-mes').value;
-  var comision = parseFloat(document.getElementById('inp-comision').value) / 100;
   var partes = mes.split('-');
-  var anio = partes[0];
-  var nmes = partes[1];
-  var nombreMes = MESES[parseInt(nmes)-1] + ' ' + anio;
+  var anio = parseInt(partes[0]);
+  var nmes = parseInt(partes[1]);
+  var nombreMes = MESES[nmes-1] + ' ' + anio;
+  var mod = modalidadActual;
+  var comision = parseFloat(document.getElementById('inp-comision').value) / 100;
+  var sueldoSemanal = parseFloat(document.getElementById('inp-semanal').value) || 0;
+  var sueldoMensual = parseFloat(document.getElementById('inp-mensual').value) || 0;
+  var diasEnMes = new Date(anio, nmes, 0).getDate();
+  var semanasEnMes = Math.round(diasEnMes / 7 * 10) / 10;
+
   document.getElementById('resultado').innerHTML = '<div class="empty-state">⏳ Calculando...</div>';
+
   fetch(CONFIG.urlSheet + '?accion=liquidacion&mes=' + mes)
     .then(function(r) { return r.json(); })
-    .then(function(data) { renderLiquidacion(data, comision, nombreMes); })
+    .then(function(data) { renderLiquidacion(data, mod, comision, sueldoSemanal, sueldoMensual, semanasEnMes, nombreMes); })
     .catch(function() {
       var key = 'gestorbase_agenda_' + CONFIG.negocio;
       var todosLsTurnos = [];
@@ -241,11 +293,11 @@ function calcular() {
       for (var ei = 0; ei < CONFIG.empleados.length; ei++) {
         data.ingresos_por_empleado[CONFIG.empleados[ei]] = 0;
       }
-      renderLiquidacion(data, comision, nombreMes);
+      renderLiquidacion(data, mod, comision, sueldoSemanal, sueldoMensual, semanasEnMes, nombreMes);
     });
 }
 
-function renderLiquidacion(data, comision, nombreMes) {
+function renderLiquidacion(data, mod, comision, sueldoSemanal, sueldoMensual, semanasEnMes, nombreMes) {
   var turnos = data.turnos || [];
   var ingresos_emp = data.ingresos_por_empleado || {};
   var porEmpleado = {};
@@ -260,15 +312,31 @@ function renderLiquidacion(data, comision, nombreMes) {
   }
   var totalLiquidar = 0;
   for (var ei2 = 0; ei2 < CONFIG.empleados.length; ei2++) {
-    var ing = Number(ingresos_emp[CONFIG.empleados[ei2]] || 0);
-    totalLiquidar += ing * comision;
+    var emp2 = CONFIG.empleados[ei2];
+    if (mod === 'comision') {
+      totalLiquidar += Number(ingresos_emp[emp2] || 0) * comision;
+    } else if (mod === 'semanal') {
+      totalLiquidar += sueldoSemanal * semanasEnMes;
+    } else {
+      totalLiquidar += sueldoMensual;
+    }
   }
   var html = '<div class="total-card"><div class="titulo">Total a liquidar — ' + nombreMes + '</div><div class="monto">$' + fmt(totalLiquidar) + '</div></div>';
   for (var ei3 = 0; ei3 < CONFIG.empleados.length; ei3++) {
     var emp = CONFIG.empleados[ei3];
     var ts = porEmpleado[emp] || [];
     var ingEmp = Number(ingresos_emp[emp] || 0);
-    var liq = ingEmp * comision;
+    var liq, labCobrar;
+    if (mod === 'comision') {
+      liq = ingEmp * comision;
+      labCobrar = 'A cobrar (' + Math.round(comision * 100) + '%)';
+    } else if (mod === 'semanal') {
+      liq = sueldoSemanal * semanasEnMes;
+      labCobrar = 'Sueldo (' + semanasEnMes.toFixed(1) + ' sem.)';
+    } else {
+      liq = sueldoMensual;
+      labCobrar = 'Sueldo mensual';
+    }
     var inicial = emp.charAt(0).toUpperCase();
     var detalle = '';
     if (ts.length > 0) {
@@ -280,7 +348,10 @@ function renderLiquidacion(data, comision, nombreMes) {
       }
       detalle = '<button class="detalle-toggle" onclick="toggleDetalle(this)">▸ Ver detalle de turnos</button><div class="detalle-lista">' + filas + '</div>';
     }
-    html += '<div class="empleado-card"><div class="empleado-header"><div class="empleado-nombre"><div class="empleado-avatar">' + inicial + '</div>' + emp + '</div><div class="badge-turnos">' + ts.length + ' turnos</div></div><div class="liq-grid"><div class="liq-stat"><div class="val">' + ts.length + '</div><div class="lab">Turnos</div></div><div class="liq-stat"><div class="val">$' + fmt(ingEmp) + '</div><div class="lab">Facturado</div></div><div class="liq-stat comision"><div class="val">$' + fmt(liq) + '</div><div class="lab">A cobrar (' + Math.round(comision*100) + '%)</div></div></div>' + detalle + '</div>';
+    var colFact = mod === 'comision'
+      ? '<div class="liq-stat"><div class="val">$' + fmt(ingEmp) + '</div><div class="lab">Facturado</div></div>'
+      : '<div class="liq-stat"><div class="val">$' + fmt(mod === 'semanal' ? sueldoSemanal : sueldoMensual) + '</div><div class="lab">' + (mod === 'semanal' ? 'x semana' : 'fijo') + '</div></div>';
+    html += '<div class="empleado-card"><div class="empleado-header"><div class="empleado-nombre"><div class="empleado-avatar">' + inicial + '</div>' + emp + '</div><div class="badge-turnos">' + ts.length + ' turnos</div></div><div class="liq-grid"><div class="liq-stat"><div class="val">' + ts.length + '</div><div class="lab">Turnos</div></div>' + colFact + '<div class="liq-stat comision"><div class="val">$' + fmt(liq) + '</div><div class="lab">' + labCobrar + '</div></div></div>' + detalle + '</div>';
   }
   document.getElementById('resultado').innerHTML = html;
 }
