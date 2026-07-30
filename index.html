@@ -35,6 +35,7 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 .color-row input[type="color"] { height: 44px; padding: 4px 6px; cursor: pointer; }
 .btn-cfg { width: 100%; padding: 13px; background: var(--accent, #0057d9); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
 .config-logo { font-size: 2rem; text-align: center; margin-bottom: 8px; }
+.btn-cancelar { width: 100%; padding: 13px; background: none; color: #6b7280; border: 1.5px solid #e2e6f0; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
 </style>
 </head>
 <body ontouchstart="">
@@ -72,6 +73,7 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
       <textarea id="cfg-categorias" rows="4" placeholder="Insumos&#10;Servicios&#10;Sueldos&#10;Alquiler"></textarea>
     </div>
     <button class="btn-cfg" id="btn-guardar-config">Guardar y continuar</button>
+    <button class="btn-cancelar" id="btn-cancelar-config">Cancelar</button>
   </div>
 </div>
 
@@ -173,6 +175,10 @@ document.getElementById('btn-guardar-config').addEventListener('click', function
 
 document.getElementById('btn-abrir-config').addEventListener('click', function() {
   abrirConfig();
+});
+
+document.getElementById('btn-cancelar-config').addEventListener('click', function() {
+  document.getElementById('config-screen').className = '';
 });
 
 if (!savedConfig.negocio) {
