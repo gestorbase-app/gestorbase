@@ -16,8 +16,7 @@ header h1{font-size:1.1rem;font-weight:600;flex:1;}
 .nav-btn{color:white;font-size:1.1rem;text-decoration:none;padding:6px 10px;background:rgba(255,255,255,0.2);border-radius:8px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .cfg-header-btn{background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.1rem;cursor:pointer;padding:6px 10px;border-radius:8px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 /* Respaldo banner */
-.respaldo-banner{display:none;background:#fff8e1;border:1px solid #ffc107;border-radius:8px;padding:10px 14px;margin:12px 16px 0;font-size:0.85rem;color:#5d4037;cursor:pointer;touch-action:manipulation;align-items:center;justify-content:space-between;gap:8px;}
-.respaldo-banner.visible{display:flex;}
+.respaldo-banner{display:flex;background:#fff8e1;border:1px solid #ffc107;border-radius:8px;padding:10px 14px;margin:12px 16px 0;font-size:0.85rem;color:#5d4037;cursor:pointer;touch-action:manipulation;align-items:center;justify-content:space-between;gap:8px;}
 /* Tabs */
 .tabs{display:flex;background:white;border-bottom:2px solid var(--border);}
 .tab{flex:1;padding:14px 12px;text-align:center;font-size:0.85rem;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;}
@@ -111,7 +110,7 @@ textarea{resize:vertical;min-height:70px;}
 
 <!-- Respaldo banner -->
 <div class="respaldo-banner" id="respaldo-banner" onclick="verRespaldo()">
-  <span>💾 <span id="respaldo-count">0</span> registros guardados localmente</span>
+  <span>💾 <span id="respaldo-count">Sin datos pendientes</span></span>
   <span style="font-weight:600">Ver / Sincronizar →</span>
 </div>
 
@@ -265,13 +264,7 @@ var filtroActivo = 'todos';
 function actualizarBanner() {
   var datos = [];
   try { datos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
-  var banner = document.getElementById('respaldo-banner');
-  if (datos.length > 0) {
-    document.getElementById('respaldo-count').textContent = datos.length;
-    banner.className = 'respaldo-banner visible';
-  } else {
-    banner.className = 'respaldo-banner';
-  }
+  document.getElementById('respaldo-count').textContent = datos.length > 0 ? datos.length + ' registros guardados localmente' : 'Sin datos pendientes';
 }
 
 function verRespaldo() {
