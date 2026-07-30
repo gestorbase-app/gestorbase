@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="apple-touch-icon" href="gestorbase-icono-180.png">
+<link rel="manifest" href="manifest.json">
 <title>GestorBase — Guía Plan Premium</title>
 <style>
 :root {
@@ -204,6 +206,7 @@ footer strong { color: white; }
   <a href="#agenda">Agenda</a>
   <a href="#gastos">Gastos</a>
   <a href="#informes">Informes</a>
+  <a href="#respaldo">💾 Respaldo</a>
   <a href="#liquidacion" class="nav-premium">⭐ Liquidación</a>
   <a href="#buscador" class="nav-premium">⭐ Buscador</a>
   <a href="#resumen" class="nav-premium">⭐ Resumen</a>
@@ -584,6 +587,27 @@ function doGet(e) {
       <li data-n="5">Más abajo aparece el detalle de cada turno y cada gasto del período.</li>
     </ul>
     <div class="caja info"><strong>💡 ¿De dónde salen los datos?</strong>Los ingresos vienen de los turnos cargados en la <strong>Agenda</strong>. Los gastos vienen del módulo <strong>Gastos</strong>. No hay nada que cargar en Informes — solo consultás.</div>
+  </section>
+
+  <!-- RESPALDO LOCAL -->
+  <section id="respaldo">
+    <h2>💾 Respaldo local — Tus datos nunca se pierden</h2>
+    <p>Cuando guardás un turno o un gasto <strong>sin conexión a internet</strong>, GestorBase lo guarda automáticamente en el celular. Cuando volvés a tener internet, podés enviarlo a tu planilla con un toque.</p>
+
+    <div class="caja info"><strong>💡 ¿Cómo sé si tengo datos guardados?</strong>En la parte de arriba de cada módulo vas a ver siempre una barra amarilla que dice cuántos registros hay guardados localmente. Si dice "Sin datos pendientes", todo está sincronizado.</div>
+
+    <h3>Cómo sincronizar tus datos</h3>
+    <ul class="pasos">
+      <li data-n="1">Buscá la barra amarilla que dice <strong>💾 X registros guardados localmente</strong> en la parte superior del módulo Agenda o Gastos.</li>
+      <li data-n="2">Tocá esa barra para abrir el panel de respaldo.</li>
+      <li data-n="3">Vas a ver la lista de registros pendientes de enviar.</li>
+      <li data-n="4">Tocá <strong>"Sincronizar"</strong>. El sistema los envía uno por uno a tu planilla de Google.</li>
+      <li data-n="5">Cuando termina, la barra vuelve a decir "Sin datos pendientes".</li>
+    </ul>
+
+    <div class="caja aviso"><strong>⚠️ Necesitás internet para sincronizar</strong>La sincronización requiere conexión. Si intentás sincronizar sin internet, el proceso va a fallar y los datos van a seguir guardados en el celular hasta que puedas intentarlo de nuevo.</div>
+
+    <div class="caja aviso"><strong>⚠️ La barra amarilla siempre está visible</strong>Aunque no tengas datos pendientes, la barra aparece igual con el mensaje "Sin datos pendientes". Eso es normal — es para que siempre sepas el estado de tu sistema.</div>
   </section>
 
   <!-- LIQUIDACIÓN -->
