@@ -3,117 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="apple-touch-icon" href="gestorbase-icono-180.png">
-<link rel="manifest" href="manifest.json">
-<title id="page-title">Resumen</title>
+<title>Resumen</title>
 <style>
-:root {
-  --blue: #003b8e;
-  --accent: #0057d9;
-  --gray: #f0f2f7;
-  --white: #fff;
-  --text: #1a1a2e;
-  --muted: #6b7280;
-  --border: #e2e6f0;
-  --success: #16a34a;
-  --danger: #e53e3e;
-  --warning: #d97706;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray); color: var(--text); min-height: 100vh; }
-.header-top { background: var(--blue); color: #fff; padding: 20px 20px 40px; }
-.header-top h1 { font-size: 1.2rem; font-weight: 700; margin-bottom: 2px; }
-.header-top .fecha { font-size: 0.82rem; opacity: .7; }
-.header-top .negocio { font-size: 0.85rem; opacity: .85; margin-top: 2px; }
-.contenido { padding: 0 16px 24px; max-width: 680px; margin: -24px auto 0; }
-.balance-hero { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,.1); margin-bottom: 16px; }
-.balance-hero .titulo { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
-.balance-hero .monto { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 16px; }
-.balance-hero .monto.pos { color: var(--success); }
-.balance-hero .monto.neg { color: var(--danger); }
-.balance-hero .monto.neu { color: var(--text); }
-.balance-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.balance-item { background: var(--gray); border-radius: 10px; padding: 12px; text-align: center; }
-.balance-item .val { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.balance-item .val.ing { color: var(--success); }
-.balance-item .val.gas { color: var(--danger); }
-.balance-item .lab { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-.seccion-titulo { font-size: 0.82rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; margin-top: 20px; }
-.turno-hoy { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; align-items: center; gap: 12px; }
-.turno-hora-badge { background: var(--blue); color: #fff; border-radius: 8px; padding: 5px 9px; font-size: 0.82rem; font-weight: 700; white-space: nowrap; }
-.turno-hoy-info { flex: 1; }
-.turno-hoy-nombre { font-weight: 700; font-size: 0.95rem; }
-.turno-hoy-detalle { font-size: 0.78rem; color: var(--muted); margin-top: 1px; }
-.modulos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
-.modulo-btn { background: #fff; border-radius: 12px; padding: 16px 8px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.07); display: block; touch-action: manipulation; }
-.modulo-btn .ico { font-size: 1.6rem; margin-bottom: 6px; }
-.modulo-btn .nom { font-size: 0.78rem; font-weight: 700; }
-.modulo-btn.premium-mod { border: 1.5px solid var(--accent); }
-.modulo-btn.premium-mod .nom { color: var(--accent); }
-.empleado-row { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; align-items: center; gap: 12px; }
-.emp-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.88rem; flex-shrink: 0; }
-.emp-info { flex: 1; }
-.emp-nombre { font-weight: 700; font-size: 0.92rem; }
-.emp-turnos { font-size: 0.78rem; color: var(--muted); }
-.emp-monto { font-size: 0.95rem; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; }
-.btn-actualizar-todo { width: 100%; padding: 12px; background: var(--gray); border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.88rem; font-weight: 600; color: var(--muted); cursor: pointer; margin-top: 8px; touch-action: manipulation; }
-.empty-mini { text-align: center; padding: 20px; color: var(--muted); font-size: 0.85rem; background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-.cfg-header-btn { background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer; padding: 4px; touch-action: manipulation; float: right; }
-/* Config screen */
-#config-screen { display: none; position: fixed; inset: 0; background: var(--gray); z-index: 200; overflow-y: auto; padding: 24px 16px; }
-#config-screen.visible { display: block; }
-#config-screen h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-#config-screen p { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
-.cfg-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 16px; }
-.form-group { margin-bottom: 14px; }
-.form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
-.form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 0.95rem; font-family: inherit; color: var(--text); background: white; }
-.form-group textarea { resize: vertical; min-height: 80px; }
-.color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.color-row input[type="color"] { height: 44px; padding: 4px 6px; cursor: pointer; }
-.btn-cfg { width: 100%; padding: 13px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
-.config-logo { font-size: 2rem; text-align: center; margin-bottom: 8px; }
+:root { --blue:#003b8e; --accent:#0057d9; --gray:#f0f2f7; --text:#1a1a2e; --muted:#6b7280; --border:#e2e6f0; --danger:#e53e3e; --success:#16a34a; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:system-ui,sans-serif; background:var(--gray); color:var(--text); min-height:100vh; }
+.respaldo-banner { display:flex; background:#fff8e1; border:1px solid #ffc107; border-radius:8px; padding:10px 14px; margin:12px 16px 0; font-size:0.85rem; color:#5d4037; cursor:pointer; touch-action:manipulation; align-items:center; justify-content:space-between; gap:8px; }
+#config-screen { display:none; position:fixed; inset:0; background:var(--gray); z-index:200; overflow-y:auto; padding:24px 16px; }
+#config-screen.visible { display:block; }
+#config-screen h2 { font-size:1.1rem; font-weight:700; margin-bottom:4px; }
+#config-screen .subtitulo { font-size:0.85rem; color:var(--muted); margin-bottom:20px; }
+.cfg-card { background:white; border-radius:10px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.07); margin-bottom:16px; }
+.form-group { margin-bottom:14px; }
+.form-group label { display:block; font-size:0.75rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px; }
+.form-group input, .form-group textarea { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:7px; font-size:0.95rem; font-family:inherit; color:var(--text); background:white; }
+.form-group textarea { resize:vertical; min-height:70px; }
+.color-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.color-row input[type="color"] { height:44px; padding:4px 6px; cursor:pointer; }
+.btn-cfg { width:100%; padding:13px; background:var(--accent); color:white; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; margin-top:8px; touch-action:manipulation; }
+.btn-volver { width:100%; padding:13px; background:none; border:1.5px solid var(--border); border-radius:8px; font-size:1rem; color:var(--muted); cursor:pointer; margin-top:8px; touch-action:manipulation; }
+.header-top { background:var(--blue); color:#fff; padding:16px 16px 40px; position:relative; }
+.header-top-row { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.nav-btn { color:white; font-size:1.1rem; text-decoration:none; padding:6px 10px; background:rgba(255,255,255,0.2); border-radius:8px; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.cfg-header-btn { background:rgba(255,255,255,0.2); border:none; color:white; font-size:1.1rem; cursor:pointer; padding:6px 10px; border-radius:8px; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.header-top h1 { font-size:1.15rem; font-weight:700; flex:1; }
+.header-top .negocio { font-size:0.85rem; opacity:.85; }
+.header-top .fecha { font-size:0.8rem; opacity:.7; margin-top:2px; }
+.contenido { padding:0 16px 24px; max-width:680px; margin:-24px auto 0; }
+.balance-hero { background:#fff; border-radius:16px; padding:20px; box-shadow:0 4px 16px rgba(0,0,0,.1); margin-bottom:16px; }
+.balance-hero .titulo { font-size:0.78rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.balance-hero .monto { font-size:2rem; font-weight:700; font-variant-numeric:tabular-nums; line-height:1; margin-bottom:16px; }
+.monto.pos { color:var(--success); }
+.monto.neg { color:var(--danger); }
+.monto.neu { color:var(--text); }
+.balance-fila { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.balance-item { background:var(--gray); border-radius:10px; padding:12px; text-align:center; }
+.balance-item .val { font-size:1.1rem; font-weight:700; font-variant-numeric:tabular-nums; }
+.balance-item .val.ing { color:var(--success); }
+.balance-item .val.gas { color:var(--danger); }
+.balance-item .lab { font-size:0.75rem; color:var(--muted); margin-top:2px; }
+.seccion-titulo { font-size:0.82rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; margin-top:20px; }
+.turno-hoy { background:#fff; border-radius:12px; padding:12px 14px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,.06); display:flex; align-items:center; gap:12px; }
+.turno-hora-badge { background:var(--blue); color:#fff; border-radius:8px; padding:5px 9px; font-size:0.82rem; font-weight:700; white-space:nowrap; }
+.turno-hoy-info { flex:1; }
+.turno-hoy-nombre { font-weight:700; font-size:0.95rem; }
+.turno-hoy-detalle { font-size:0.78rem; color:var(--muted); margin-top:1px; }
+.modulos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+.modulo-btn { background:#fff; border-radius:12px; padding:16px 8px; text-align:center; text-decoration:none; color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,.07); display:block; touch-action:manipulation; }
+.modulo-btn .ico { font-size:1.6rem; margin-bottom:6px; }
+.modulo-btn .nom { font-size:0.78rem; font-weight:700; }
+.modulo-btn.premium-mod { border:1.5px solid var(--accent); }
+.modulo-btn.premium-mod .nom { color:var(--accent); }
+.empleado-row { background:#fff; border-radius:12px; padding:12px 14px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,.06); display:flex; align-items:center; gap:12px; }
+.emp-avatar { width:36px; height:36px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.88rem; flex-shrink:0; }
+.emp-info { flex:1; }
+.emp-nombre { font-weight:700; font-size:0.92rem; }
+.emp-turnos { font-size:0.78rem; color:var(--muted); }
+.emp-monto { font-size:0.95rem; font-weight:700; color:var(--blue); font-variant-numeric:tabular-nums; }
+.btn-actualizar { width:100%; padding:12px; background:var(--gray); border:1.5px solid var(--border); border-radius:10px; font-size:0.88rem; font-weight:600; color:var(--muted); cursor:pointer; margin-top:8px; touch-action:manipulation; }
+.empty-mini { text-align:center; padding:20px; color:var(--muted); font-size:0.85rem; background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:300; align-items:flex-end; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:white; border-radius:16px 16px 0 0; padding:24px 20px; width:100%; max-width:500px; max-height:80vh; overflow-y:auto; }
+.modal h2 { font-size:1.05rem; font-weight:700; margin-bottom:8px; }
+.btn { width:100%; padding:13px; background:var(--accent); color:white; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; touch-action:manipulation; margin-top:4px; }
+.btn-gray { background:none; border:1.5px solid var(--border); color:var(--muted); }
 </style>
 </head>
 <body ontouchstart="">
 
-<!-- Pantalla de configuración -->
 <div id="config-screen">
-  <div class="config-logo">📋</div>
+  <div style="font-size:2rem;text-align:center;margin-bottom:8px">⚙️</div>
   <h2>Configuración de GestorBase</h2>
-  <p>Completá los datos de tu negocio. Esta configuración se aplica a todos los módulos.</p>
+  <p class="subtitulo">Estos datos se aplican a todos los módulos.</p>
   <div class="cfg-card">
-    <div class="form-group">
-      <label>Nombre del negocio</label>
-      <input type="text" id="cfg-negocio" placeholder="Ej: Peluquería Carla">
-    </div>
-    <div class="form-group">
-      <label>URL de tu planilla Google</label>
-      <input type="url" id="cfg-url" placeholder="https://script.google.com/...">
-    </div>
+    <div class="form-group"><label>Nombre del negocio</label><input type="text" id="cfg-negocio" placeholder="Ej: Peluquería Carla"></div>
+    <div class="form-group"><label>URL de tu planilla Google</label><input type="url" id="cfg-url" placeholder="https://script.google.com/..."></div>
     <div class="color-row">
-      <div class="form-group">
-        <label>Color principal</label>
-        <input type="color" id="cfg-color1" value="#003b8e">
-      </div>
-      <div class="form-group">
-        <label>Color acento</label>
-        <input type="color" id="cfg-color2" value="#0057d9">
-      </div>
+      <div class="form-group"><label>Color principal</label><input type="color" id="cfg-color1" value="#003b8e"></div>
+      <div class="form-group"><label>Color acento</label><input type="color" id="cfg-color2" value="#0057d9"></div>
     </div>
-    <div class="form-group">
-      <label>Empleados (uno por línea)</label>
-      <textarea id="cfg-empleados" rows="4" placeholder="Empleado 1&#10;Empleado 2&#10;Empleado 3"></textarea>
-    </div>
-    <button class="btn-cfg" id="btn-guardar-config">Guardar y continuar</button>
+    <div class="form-group"><label>Empleados (uno por línea)</label><textarea id="cfg-empleados" rows="3" placeholder="Empleado 1&#10;Empleado 2"></textarea></div>
+    <div class="form-group"><label>Categorías de gastos (una por línea)</label><textarea id="cfg-categorias" rows="3" placeholder="Insumos&#10;Servicios&#10;Sueldos"></textarea></div>
+    <button class="btn-cfg" id="btn-guardar-config">Guardar cambios</button>
+    <button class="btn-volver" id="btn-cancelar-config">Volver al Resumen</button>
   </div>
 </div>
 
 <div class="header-top">
-  <button class="cfg-header-btn" id="btn-abrir-config">⚙️</button>
-  <h1 id="header-saludo">Buenos días</h1>
+  <div class="header-top-row">
+    <a href="index-premium.html" class="nav-btn">←</a>
+    <h1 id="header-saludo">Buenos días</h1>
+    <button class="cfg-header-btn" id="btn-abrir-config">⚙️</button>
+  </div>
   <div class="negocio" id="header-negocio"></div>
   <div class="fecha" id="header-fecha"></div>
+</div>
+
+<div class="respaldo-banner" id="respaldo-banner" onclick="verRespaldo()">
+  <span>💾 <span id="respaldo-count">Sin datos pendientes</span></span>
+  <span style="font-weight:600">Ver / Sincronizar →</span>
 </div>
 
 <div class="contenido">
@@ -121,14 +110,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="titulo" id="balance-titulo">Balance del mes</div>
     <div class="monto neu" id="balance-monto">Cargando...</div>
     <div class="balance-fila">
-      <div class="balance-item">
-        <div class="val ing" id="bal-ingresos">-</div>
-        <div class="lab">Ingresos</div>
-      </div>
-      <div class="balance-item">
-        <div class="val gas" id="bal-gastos">-</div>
-        <div class="lab">Gastos</div>
-      </div>
+      <div class="balance-item"><div class="val ing" id="bal-ingresos">-</div><div class="lab">Ingresos</div></div>
+      <div class="balance-item"><div class="val gas" id="bal-gastos">-</div><div class="lab">Gastos</div></div>
     </div>
   </div>
 
@@ -142,36 +125,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="seccion-titulo">Empleados este mes</div>
   <div id="empleados-resumen"><div class="empty-mini">Cargando...</div></div>
 
-  <button class="btn-actualizar-todo" id="btn-actualizar">↻ Actualizar datos</button>
+  <button class="btn-actualizar" id="btn-actualizar">↻ Actualizar datos</button>
+</div>
+
+<div class="modal-overlay" id="modal-respaldo">
+  <div class="modal">
+    <h2>💾 Datos locales</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">Registros guardados en este dispositivo.</p>
+    <div id="respaldo-lista"></div>
+    <button class="btn btn-gray" style="margin-top:16px" onclick="cerrarRespaldo()">Cerrar</button>
+  </div>
 </div>
 
 <script>
 var CONFIG_KEY = 'gestorbase_config';
-var CONFIG_DEFAULT = {
-  negocio: 'Mi Negocio',
-  colorPrincipal: '#003b8e',
-  colorAccent: '#0057d9',
-  urlSheet: '',
-  empleados: ['Empleado 1', 'Empleado 2', 'Empleado 3']
-};
+var CONFIG_DEFAULT = { negocio:'Mi Negocio', colorPrincipal:'#003b8e', colorAccent:'#0057d9', urlSheet:'', empleados:['Empleado 1','Empleado 2','Empleado 3'], categorias:['Insumos','Servicios','Sueldos','Alquiler','Mantenimiento','Otros'] };
 var savedConfig = {};
 try { savedConfig = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch(e) {}
 var CONFIG = {};
-var keys = Object.keys(CONFIG_DEFAULT);
-for (var ki = 0; ki < keys.length; ki++) {
-  CONFIG[keys[ki]] = savedConfig[keys[ki]] !== undefined ? savedConfig[keys[ki]] : CONFIG_DEFAULT[keys[ki]];
-}
+Object.keys(CONFIG_DEFAULT).forEach(function(k){ CONFIG[k] = savedConfig[k] !== undefined ? savedConfig[k] : CONFIG_DEFAULT[k]; });
 
-var MODULOS_BASICO = [
-  { nombre: 'Agenda', archivo: 'agenda.html', icono: '📅' },
-  { nombre: 'Gastos', archivo: 'gastos.html', icono: '💰' },
-  { nombre: 'Informes', archivo: 'informes.html', icono: '📊' }
-];
-var MODULOS_PREMIUM = [
-  { nombre: 'Liquidación', archivo: 'liquidacion.html', icono: '💼' },
-  { nombre: 'Buscador', archivo: 'buscador.html', icono: '🔍' }
-];
-
+var MODULOS_BASICO = [{nombre:'Agenda',archivo:'agenda.html',icono:'📅'},{nombre:'Gastos',archivo:'gastos.html',icono:'💰'},{nombre:'Informes',archivo:'informes.html',icono:'📊'}];
+var MODULOS_PREMIUM = [{nombre:'Liquidación',archivo:'liquidacion.html',icono:'💼'},{nombre:'Buscador',archivo:'buscador.html',icono:'🔍'}];
 var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 var DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
@@ -179,36 +154,16 @@ function aplicarConfig() {
   document.documentElement.style.setProperty('--blue', CONFIG.colorPrincipal);
   document.documentElement.style.setProperty('--accent', CONFIG.colorAccent);
   var hoy = new Date();
-  document.getElementById('page-title').textContent = 'Resumen — ' + CONFIG.negocio;
+  document.title = CONFIG.negocio + ' — Resumen';
   document.getElementById('header-negocio').textContent = CONFIG.negocio;
   document.getElementById('header-fecha').textContent = DIAS[hoy.getDay()] + ' ' + hoy.getDate() + ' de ' + MESES[hoy.getMonth()] + ' ' + hoy.getFullYear();
   var hora = hoy.getHours();
-  var saludo = hora < 12 ? 'Buenos días' : hora < 20 ? 'Buenas tardes' : 'Buenas noches';
-  document.getElementById('header-saludo').textContent = saludo;
-  var mes = MESES[hoy.getMonth()] + ' ' + hoy.getFullYear();
-  document.getElementById('balance-titulo').textContent = 'Balance — ' + mes;
-
-  var gridBasico = document.getElementById('modulos-basico');
-  gridBasico.innerHTML = '';
-  for (var i = 0; i < MODULOS_BASICO.length; i++) {
-    var m = MODULOS_BASICO[i];
-    var a = document.createElement('a');
-    a.href = m.archivo;
-    a.className = 'modulo-btn';
-    a.innerHTML = '<div class="ico">' + m.icono + '</div><div class="nom">' + m.nombre + '</div>';
-    gridBasico.appendChild(a);
-  }
-
-  var gridPremium = document.getElementById('modulos-premium');
-  gridPremium.innerHTML = '';
-  for (var j = 0; j < MODULOS_PREMIUM.length; j++) {
-    var mp = MODULOS_PREMIUM[j];
-    var ap = document.createElement('a');
-    ap.href = mp.archivo;
-    ap.className = 'modulo-btn premium-mod';
-    ap.innerHTML = '<div class="ico">' + mp.icono + '</div><div class="nom">' + mp.nombre + '</div>';
-    gridPremium.appendChild(ap);
-  }
+  document.getElementById('header-saludo').textContent = hora < 12 ? 'Buenos días' : hora < 20 ? 'Buenas tardes' : 'Buenas noches';
+  document.getElementById('balance-titulo').textContent = 'Balance — ' + MESES[hoy.getMonth()] + ' ' + hoy.getFullYear();
+  var gb = document.getElementById('modulos-basico'); gb.innerHTML = '';
+  MODULOS_BASICO.forEach(function(m){ var a=document.createElement('a'); a.href=m.archivo; a.className='modulo-btn'; a.innerHTML='<div class="ico">'+m.icono+'</div><div class="nom">'+m.nombre+'</div>'; gb.appendChild(a); });
+  var gp = document.getElementById('modulos-premium'); gp.innerHTML = '';
+  MODULOS_PREMIUM.forEach(function(m){ var a=document.createElement('a'); a.href=m.archivo; a.className='modulo-btn premium-mod'; a.innerHTML='<div class="ico">'+m.icono+'</div><div class="nom">'+m.nombre+'</div>'; gp.appendChild(a); });
 }
 
 function abrirConfig() {
@@ -217,115 +172,103 @@ function abrirConfig() {
   document.getElementById('cfg-color1').value = CONFIG.colorPrincipal;
   document.getElementById('cfg-color2').value = CONFIG.colorAccent;
   document.getElementById('cfg-empleados').value = CONFIG.empleados.join('\n');
+  document.getElementById('cfg-categorias').value = CONFIG.categorias.join('\n');
   document.getElementById('config-screen').className = 'visible';
 }
-
-document.getElementById('btn-guardar-config').addEventListener('click', function() {
+document.getElementById('btn-abrir-config').addEventListener('click', abrirConfig);
+document.getElementById('btn-cancelar-config').addEventListener('click', function(){ document.getElementById('config-screen').className = ''; });
+document.getElementById('btn-guardar-config').addEventListener('click', function(){
   var negocio = document.getElementById('cfg-negocio').value.trim();
   var url = document.getElementById('cfg-url').value.trim();
-  if (!negocio || !url) {
-    alert('Completá el nombre del negocio y la URL de la planilla.');
-    return;
-  }
-  var empleadosRaw = document.getElementById('cfg-empleados').value.trim();
-  var empleados = [];
-  var lineas = empleadosRaw.split('\n');
-  for (var i = 0; i < lineas.length; i++) {
-    var l = lineas[i].trim();
-    if (l) empleados.push(l);
-  }
-  if (!empleados.length) empleados = ['Empleado 1'];
-  var nuevaConfig = {
-    negocio: negocio,
-    urlSheet: url,
-    colorPrincipal: document.getElementById('cfg-color1').value,
-    colorAccent: document.getElementById('cfg-color2').value,
-    empleados: empleados,
-    categorias: savedConfig.categorias || ['Insumos','Servicios','Sueldos','Alquiler','Mantenimiento','Otros'],
-    porcentajeComision: savedConfig.porcentajeComision || 50
-  };
-  try { localStorage.setItem(CONFIG_KEY, JSON.stringify(nuevaConfig)); } catch(e) {}
+  if (!negocio || !url) { alert('Completá el nombre del negocio y la URL de la planilla.'); return; }
+  var empleados = document.getElementById('cfg-empleados').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  var categorias = document.getElementById('cfg-categorias').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  if (!empleados.length) empleados = CONFIG_DEFAULT.empleados;
+  if (!categorias.length) categorias = CONFIG_DEFAULT.categorias;
+  var c = { negocio:negocio, urlSheet:url, colorPrincipal:document.getElementById('cfg-color1').value, colorAccent:document.getElementById('cfg-color2').value, empleados:empleados, categorias:categorias };
+  try { localStorage.setItem(CONFIG_KEY, JSON.stringify(c)); } catch(e) {}
   location.reload();
 });
 
-document.getElementById('btn-abrir-config').addEventListener('click', function() {
-  abrirConfig();
-});
-
-document.getElementById('btn-actualizar').addEventListener('click', function() {
-  cargarTodo();
-});
-
-if (!savedConfig.negocio) {
-  abrirConfig();
-}
-
+if (!savedConfig.negocio) { abrirConfig(); }
 aplicarConfig();
 
+var neg = CONFIG.negocio.replace(/\s+/g,'_');
+function getLocalData() {
+  var agenda = []; var gastos = [];
+  try { agenda = JSON.parse(localStorage.getItem('gestorbase_agenda_' + neg) || '[]'); } catch(e){}
+  try { gastos = JSON.parse(localStorage.getItem('gestorbase_gastos_' + neg) || '[]'); } catch(e){}
+  return { turnos: agenda, gastos: gastos };
+}
+
+function actualizarBanner() {
+  var local = getLocalData();
+  var total = local.turnos.length + local.gastos.length;
+  document.getElementById('respaldo-count').textContent = total > 0 ? total + ' registros locales disponibles' : 'Sin datos pendientes';
+}
+
+function verRespaldo() {
+  var local = getLocalData();
+  var total = local.turnos.length + local.gastos.length;
+  var lista = document.getElementById('respaldo-lista');
+  if (!total) {
+    lista.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px">No hay datos guardados localmente.</p>';
+  } else {
+    lista.innerHTML = '<p style="font-size:0.85rem;color:var(--muted)">' + local.turnos.length + ' turnos y ' + local.gastos.length + ' gastos guardados localmente. Podés sincronizarlos desde los módulos Agenda y Gastos.</p>';
+  }
+  document.getElementById('modal-respaldo').classList.add('open');
+}
+function cerrarRespaldo() { document.getElementById('modal-respaldo').classList.remove('open'); }
+
+document.getElementById('btn-actualizar').addEventListener('click', cargarTodo);
+
 function cargarTodo() {
+  if (!CONFIG.urlSheet) { renderTodo({ ingresos:0, gastos_total:0, balance:0, turnos_mes:[] }); return; }
   fetch(CONFIG.urlSheet + '?accion=resumen')
-    .then(function(r) { return r.json(); })
-    .then(function(data) { renderTodo(data); })
-    .catch(function() {
-      renderTodo({ ingresos: 0, gastos_total: 0, balance: 0, turnos_mes: [] });
+    .then(function(r){ return r.json(); })
+    .then(function(data){ renderTodo(data); })
+    .catch(function(){
+      var local = getLocalData();
+      var hoy = new Date();
+      var mesStr = hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0');
+      var turnosMes = local.turnos.filter(function(t){ return t.fecha && t.fecha.startsWith(mesStr); });
+      var ingresos = turnosMes.reduce(function(s,t){ return s+Number(t.monto||0); },0);
+      var gastos_total = local.gastos.filter(function(g){ return g.fecha && g.fecha.startsWith(mesStr); }).reduce(function(s,g){ return s+Number(g.monto||0); },0);
+      renderTodo({ ingresos:ingresos, gastos_total:gastos_total, balance:ingresos-gastos_total, turnos_mes:turnosMes });
     });
 }
 
 function renderTodo(data) {
   var hoy = new Date();
   var fechaHoy = hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0') + '-' + String(hoy.getDate()).padStart(2,'0');
-
-  var ing = Number(data.ingresos || 0);
-  var gas = Number(data.gastos_total || 0);
-  var bal = Number(data.balance || 0);
-  var elMonto = document.getElementById('balance-monto');
-  elMonto.textContent = (bal >= 0 ? '+' : '') + '$' + fmt(Math.abs(bal));
-  elMonto.className = 'monto ' + (bal > 0 ? 'pos' : bal < 0 ? 'neg' : 'neu');
+  var ing = Number(data.ingresos||0); var gas = Number(data.gastos_total||0); var bal = Number(data.balance||0);
+  var el = document.getElementById('balance-monto');
+  el.textContent = (bal>=0?'+':'') + '$' + fmt(Math.abs(bal));
+  el.className = 'monto ' + (bal>0?'pos':bal<0?'neg':'neu');
   document.getElementById('bal-ingresos').textContent = '$' + fmt(ing);
   document.getElementById('bal-gastos').textContent = '$' + fmt(gas);
-
   var turnosMes = data.turnos_mes || [];
-  var turnosHoy = [];
-  for (var i = 0; i < turnosMes.length; i++) {
-    if (turnosMes[i].fecha === fechaHoy) turnosHoy.push(turnosMes[i]);
-  }
-  turnosHoy.sort(function(a,b) { return (a.hora||'').localeCompare(b.hora||''); });
-
+  var turnosHoy = turnosMes.filter(function(t){ return t.fecha===fechaHoy; });
+  turnosHoy.sort(function(a,b){ return (a.hora||'').localeCompare(b.hora||''); });
   var contHoy = document.getElementById('turnos-hoy');
   if (!turnosHoy.length) {
     contHoy.innerHTML = '<div class="empty-mini">Sin turnos para hoy</div>';
   } else {
-    var htmlHoy = '';
-    for (var ti = 0; ti < turnosHoy.length; ti++) {
-      var t = turnosHoy[ti];
-      htmlHoy += '<div class="turno-hoy"><div class="turno-hora-badge">' + (t.hora||'') + '</div><div class="turno-hoy-info"><div class="turno-hoy-nombre">' + (t.cliente||'-') + '</div><div class="turno-hoy-detalle">' + (t.servicio||'-') + (t.empleado ? ' · 👤 ' + t.empleado : '') + '</div></div>' + (t.monto ? '<div style="font-weight:700;color:var(--success);font-size:.9rem">$' + fmt(t.monto) + '</div>' : '') + '</div>';
-    }
-    contHoy.innerHTML = htmlHoy;
+    contHoy.innerHTML = turnosHoy.map(function(t){
+      return '<div class="turno-hoy"><div class="turno-hora-badge">'+(t.hora||'')+'</div><div class="turno-hoy-info"><div class="turno-hoy-nombre">'+(t.cliente||'-')+'</div><div class="turno-hoy-detalle">'+(t.servicio||'-')+(t.empleado?' · 👤 '+t.empleado:'')+'</div></div>'+(t.monto?'<div style="font-weight:700;color:var(--success);font-size:.9rem">$'+fmt(t.monto)+'</div>':'')+'</div>';
+    }).join('');
   }
-
   var porEmp = {};
-  for (var ei = 0; ei < CONFIG.empleados.length; ei++) {
-    porEmp[CONFIG.empleados[ei]] = { turnos: 0, monto: 0 };
-  }
-  for (var ti2 = 0; ti2 < turnosMes.length; ti2++) {
-    var tm = turnosMes[ti2];
-    if (tm.empleado && porEmp[tm.empleado] !== undefined) {
-      porEmp[tm.empleado].turnos++;
-      porEmp[tm.empleado].monto += Number(tm.monto || 0);
-    }
-  }
-  var htmlEmp = '';
-  for (var ei2 = 0; ei2 < CONFIG.empleados.length; ei2++) {
-    var emp = CONFIG.empleados[ei2];
-    htmlEmp += '<div class="empleado-row"><div class="emp-avatar">' + emp.charAt(0) + '</div><div class="emp-info"><div class="emp-nombre">' + emp + '</div><div class="emp-turnos">' + porEmp[emp].turnos + ' turno(s) este mes</div></div><div class="emp-monto">$' + fmt(porEmp[emp].monto) + '</div></div>';
-  }
-  document.getElementById('empleados-resumen').innerHTML = htmlEmp;
+  CONFIG.empleados.forEach(function(e){ porEmp[e]={turnos:0,monto:0}; });
+  turnosMes.forEach(function(t){ if (t.empleado&&porEmp[t.empleado]!==undefined){ porEmp[t.empleado].turnos++; porEmp[t.empleado].monto+=Number(t.monto||0); } });
+  document.getElementById('empleados-resumen').innerHTML = CONFIG.empleados.map(function(emp){
+    return '<div class="empleado-row"><div class="emp-avatar">'+emp.charAt(0)+'</div><div class="emp-info"><div class="emp-nombre">'+emp+'</div><div class="emp-turnos">'+porEmp[emp].turnos+' turno(s) este mes</div></div><div class="emp-monto">$'+fmt(porEmp[emp].monto)+'</div></div>';
+  }).join('');
 }
 
-function fmt(n) {
-  return Number(n).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-}
+function fmt(n) { return Number(n).toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
 
+actualizarBanner();
 cargarTodo();
 </script>
 </body>
