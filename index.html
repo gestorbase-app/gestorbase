@@ -36,6 +36,8 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 .btn-cfg { width: 100%; padding: 13px; background: var(--accent, #0057d9); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
 .config-logo { font-size: 2rem; text-align: center; margin-bottom: 8px; }
 .btn-cancelar { width: 100%; padding: 13px; background: none; color: #6b7280; border: 1.5px solid #e2e6f0; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
+.alerta-respaldo { display: none; margin: 16px 20px 0; background: #fff3cd; border: 2px solid #e65100; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #b71c1c; font-weight: 600; cursor: pointer; }
+.alerta-respaldo span { display: block; font-size: 0.78rem; font-weight: 400; color: #5d4037; margin-top: 4px; }
 </style>
 </head>
 <body ontouchstart="">
@@ -84,6 +86,11 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
   </div>
   <button class="cfg-header-btn" id="btn-abrir-config">⚙️</button>
 </header>
+
+<div class="alerta-respaldo" id="alerta-respaldo" onclick="abrirConfig()">
+  ⚠️ Tenés <span id="alerta-count"></span> registros guardados sin respaldo en la nube.
+  <span>Conectá tu Google Sheet para no perder tus datos. Tocá aquí para configurarlo.</span>
+</div>
 
 <div class="grid">
   <a class="modulo" href="agenda.html">
@@ -186,6 +193,24 @@ if (!savedConfig.negocio) {
 }
 
 aplicarConfig();
+
+function verificarAlertaRespaldo() {
+  if (CONFIG.urlSheet) return;
+  var claves = ['gestorbase_agenda_', 'gestorbase_gastos_'];
+  var total = 0;
+  for (var i = 0; i < claves.length; i++) {
+    try {
+      var key = claves[i] + CONFIG.negocio;
+      var datos = JSON.parse(localStorage.getItem(key) || '[]');
+      total += datos.length;
+    } catch(e) {}
+  }
+  if (total > 20) {
+    document.getElementById('alerta-count').textContent = total;
+    document.getElementById('alerta-respaldo').style.display = 'block';
+  }
+}
+verificarAlertaRespaldo();
 </script>
 </body>
 </html>
