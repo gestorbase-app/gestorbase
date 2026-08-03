@@ -45,6 +45,8 @@
   .btn-guardar { width: 100%; background: var(--c1); color: white; border: none; border-radius: 10px; padding: 13px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 6px; touch-action: manipulation; }
   .btn-guardar:active { opacity: 0.85; }
   .btn-cancelar { width: 100%; background: none; border: none; color: #6b7280; font-size: 14px; padding: 10px; cursor: pointer; margin-top: 6px; touch-action: manipulation; }
+  .alerta-respaldo { display: none; margin: 16px 16px 0; background: #fff3cd; border: 2px solid #e65100; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #b71c1c; font-weight: 600; cursor: pointer; }
+  .alerta-respaldo span { display: block; font-size: 0.78rem; font-weight: 400; color: #5d4037; margin-top: 4px; }
 </style>
 </head>
 <body ontouchstart="">
@@ -58,6 +60,11 @@
     <div class="subtitulo">Panel de gestión completo</div>
   </div>
   <button class="btn-config" id="btnConfig">⚙️</button>
+</div>
+
+<div class="alerta-respaldo" id="alerta-respaldo" onclick="abrirConfig()">
+  ⚠️ Tenés <span id="alerta-count"></span> registros guardados sin respaldo en la nube.
+  <span>Conectá tu Google Sheet para no perder tus datos. Tocá aquí para configurarlo.</span>
 </div>
 
 <div style="height:16px;"></div>
@@ -209,6 +216,24 @@ function guardarConfig() {
 }
 
 aplicarConfig();
+
+function verificarAlertaRespaldo() {
+  if (CONFIG.urlSheet) return;
+  var claves = ['gestorbase_agenda_', 'gestorbase_gastos_', 'gestorbase_liquidacion_'];
+  var total = 0;
+  for (var i = 0; i < claves.length; i++) {
+    try {
+      var key = claves[i] + CONFIG.negocio;
+      var datos = JSON.parse(localStorage.getItem(key) || '[]');
+      total += datos.length;
+    } catch(e) {}
+  }
+  if (total > 20) {
+    document.getElementById('alerta-count').textContent = total;
+    document.getElementById('alerta-respaldo').style.display = 'block';
+  }
+}
+verificarAlertaRespaldo();
 
 var hayConfig = false;
 try { hayConfig = !!localStorage.getItem(CONFIG_KEY); } catch(e) {}
