@@ -136,6 +136,15 @@
     <div class="campo">
       <label>Porcentaje de comisión (%)</label>
       <input type="number" id="cfgComision" min="0" max="100" placeholder="50">
+      <div class="nota">Porcentaje sobre el total de servicios para calcular la liquidación del empleado</div>
+    </div>
+    <div class="campo">
+      <label>Período de liquidación</label>
+      <select id="cfgPeriodo" style="width:100%;border:1.5px solid #d1d5db;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;background:white;">
+        <option value="semanal">Semanal</option>
+        <option value="quincenal">Quincenal</option>
+        <option value="mensual">Mensual</option>
+      </select>
     </div>
     <button class="btn-guardar" id="btnGuardar">Guardar configuración</button>
     <button class="btn-cancelar" id="btnCancelar">Cancelar</button>
@@ -151,7 +160,8 @@ var CONFIG_DEFAULT = {
   urlSheet: '',
   empleados: ['Empleado 1', 'Empleado 2', 'Empleado 3'],
   categorias: ['Insumos','Servicios','Sueldos','Alquiler','Mantenimiento','Otros'],
-  porcentajeComision: 50
+  porcentajeComision: 50,
+  periodoLiquidacion: 'mensual'
 };
 
 var savedConfig = {};
@@ -177,6 +187,7 @@ function abrirConfig() {
   document.getElementById('cfgEmpleados').value = CONFIG.empleados.join('\n');
   document.getElementById('cfgCategorias').value = CONFIG.categorias.join('\n');
   document.getElementById('cfgComision').value = CONFIG.porcentajeComision;
+  document.getElementById('cfgPeriodo').value = CONFIG.periodoLiquidacion;
   document.getElementById('overlay').classList.add('visible');
 }
 
@@ -190,7 +201,8 @@ function guardarConfig() {
     urlSheet: document.getElementById('cfgUrl').value.trim(),
     empleados: empleadosRaw ? empleadosRaw.split('\n').map(function(e) { return e.trim(); }).filter(function(e) { return e; }) : CONFIG_DEFAULT.empleados,
     categorias: categoriasRaw ? categoriasRaw.split('\n').map(function(c) { return c.trim(); }).filter(function(c) { return c; }) : CONFIG_DEFAULT.categorias,
-    porcentajeComision: parseInt(document.getElementById('cfgComision').value) || 50
+    porcentajeComision: parseInt(document.getElementById('cfgComision').value) || 50,
+    periodoLiquidacion: document.getElementById('cfgPeriodo').value
   };
   try { localStorage.setItem(CONFIG_KEY, JSON.stringify(nuevaConfig)); } catch(e) {}
   location.reload();
