@@ -586,6 +586,8 @@ function doGet(e) {
     <div class="caja aviso"><strong>⚠️ Necesitás internet para sincronizar</strong>La sincronización requiere conexión. Si intentás sincronizar sin internet, el proceso va a fallar y los datos van a seguir guardados en el celular hasta que puedas intentarlo de nuevo.</div>
 
     <div class="caja aviso"><strong>⚠️ La barra amarilla siempre está visible</strong>Aunque no tengas datos pendientes, la barra aparece igual con el mensaje "Sin datos pendientes". Eso es normal — es para que siempre sepas el estado de tu sistema.</div>
+
+    <div class="caja alerta"><strong>⚠️ Alerta de respaldo — ¿Qué significa el aviso rojo?</strong>Si acumulás más de 20 registros sin tener el Google Sheet conectado, el sistema te va a mostrar un aviso rojo en la pantalla de inicio. Eso significa que tus datos están solo en el celular y conviene conectar la planilla para tener un respaldo en la nube. Tocá el aviso y te lleva directo a la configuración.</div>
   </section>
 
   <!-- PERSONALIZAR -->
@@ -756,6 +758,7 @@ function doGet(e) {
 <footer>
   <strong>GestorBase</strong> — Plan Básico<br>
   Agenda · Gastos · Informes
+  <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);font-size:0.75rem;opacity:0.55;">GestorBase® es un software registrado. La duplicación, redistribución o reventa no autorizada de este código o sus guías está prohibida y sujeta a acciones legales.</div>
 </footer>
 
 <script>
