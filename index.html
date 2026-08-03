@@ -148,8 +148,8 @@ function abrirConfig() {
 document.getElementById('btn-guardar-config').addEventListener('click', function() {
   var negocio = document.getElementById('cfg-negocio').value.trim();
   var url = document.getElementById('cfg-url').value.trim();
-  if (!negocio || !url) {
-    alert('Completá el nombre del negocio y la URL de la planilla.');
+  if (!negocio) {
+    alert('Completá el nombre de tu negocio para continuar.');
     return;
   }
   var empleadosRaw = document.getElementById('cfg-empleados').value.trim();
@@ -213,4 +213,3 @@ function verificarAlertaRespaldo() {
 verificarAlertaRespaldo();
 </script>
 </body>
-</html>
