@@ -1,4 +1,3 @@
-﻿
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -48,9 +47,37 @@
   .btn-cancelar { width: 100%; background: none; border: none; color: #6b7280; font-size: 14px; padding: 10px; cursor: pointer; margin-top: 6px; touch-action: manipulation; }
   .alerta-respaldo { display: none; margin: 16px 16px 0; background: #fff3cd; border: 2px solid #e65100; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #b71c1c; font-weight: 600; cursor: pointer; }
   .alerta-respaldo span { display: block; font-size: 0.78rem; font-weight: 400; color: #5d4037; margin-top: 4px; }
+
+  /* Pantalla de activación */
+  #activacion-screen { display: none; position: fixed; inset: 0; background: #7c3b00; z-index: 300; overflow-y: auto; padding: 40px 24px; align-items: center; justify-content: center; flex-direction: column; }
+  #activacion-screen.visible { display: flex; }
+  .act-logo { font-size: 3rem; text-align: center; margin-bottom: 12px; }
+  .act-titulo { color: white; font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
+  .act-sub { color: rgba(255,255,255,0.7); font-size: 0.9rem; text-align: center; margin-bottom: 32px; }
+  .act-card { background: white; border-radius: 14px; padding: 28px 20px; width: 100%; max-width: 380px; }
+  .act-card label { display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .act-card input { width: 100%; padding: 14px 16px; border: 2px solid #e2e6f0; border-radius: 10px; font-size: 1.1rem; font-family: monospace; color: #1a1a2e; text-align: center; text-transform: uppercase; letter-spacing: 2px; outline: none; }
+  .act-card input:focus { border-color: #f59e0b; }
+  .act-error { color: #dc2626; font-size: 0.85rem; text-align: center; margin-top: 10px; display: none; }
+  .act-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 16px; touch-action: manipulation; }
+  .act-ayuda { color: rgba(255,255,255,0.6); font-size: 0.78rem; text-align: center; margin-top: 20px; }
 </style>
 </head>
 <body ontouchstart="">
+
+<!-- Pantalla de activación -->
+<div id="activacion-screen">
+  <div class="act-logo">⭐</div>
+  <div class="act-titulo">GestorBase</div>
+  <div class="act-sub">Plan Premium</div>
+  <div class="act-card">
+    <label>Ingresá tu código de activación</label>
+    <input type="text" id="act-input" placeholder="GBP-0000" maxlength="8" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+    <div class="act-error" id="act-error">Código incorrecto. Revisá el email que recibiste.</div>
+    <button class="act-btn" id="act-btn">Activar Premium</button>
+  </div>
+  <div class="act-ayuda">¿No tenés el código? Respondé el email de compra.</div>
+</div>
 
 <div class="header">
   <div>
@@ -160,6 +187,64 @@
 </div>
 
 <script>
+var CODIGOS_VALIDOS_P = [
+  'GBP-1947','GBP-2058','GBP-3169','GBP-4270','GBP-5381','GBP-6492','GBP-7503','GBP-8614','GBP-9725','GBP-1836',
+  'GBP-2947','GBP-3058','GBP-4169','GBP-5270','GBP-6381','GBP-7492','GBP-8503','GBP-9614','GBP-1725','GBP-2836',
+  'GBP-3947','GBP-4058','GBP-5169','GBP-6270','GBP-7381','GBP-8492','GBP-9503','GBP-1614','GBP-2725','GBP-3836',
+  'GBP-4947','GBP-5058','GBP-6169','GBP-7270','GBP-8381','GBP-9492','GBP-1503','GBP-2614','GBP-3725','GBP-4836',
+  'GBP-5947','GBP-6058','GBP-7169','GBP-8270','GBP-9381','GBP-1492','GBP-2503','GBP-3614','GBP-4725','GBP-5836',
+  'GBP-6947','GBP-7058','GBP-8169','GBP-9270','GBP-1381','GBP-2492','GBP-3503','GBP-4614','GBP-5725','GBP-6836',
+  'GBP-7947','GBP-8058','GBP-9169','GBP-1270','GBP-2381','GBP-3492','GBP-4503','GBP-5614','GBP-6725','GBP-7836',
+  'GBP-8947','GBP-9058','GBP-1169','GBP-2270','GBP-3381','GBP-4492','GBP-5503','GBP-6614','GBP-7725','GBP-8836',
+  'GBP-9947','GBP-1058','GBP-2169','GBP-3270','GBP-4381','GBP-5492','GBP-6503','GBP-7614','GBP-8725','GBP-9836',
+  'GBP-1047','GBP-2158','GBP-3269','GBP-4370','GBP-5481','GBP-6592','GBP-7603','GBP-8714','GBP-9825','GBP-1936',
+  'GBP-2047','GBP-3158','GBP-4269','GBP-5370','GBP-6481','GBP-7592','GBP-8603','GBP-9714','GBP-1825','GBP-2936',
+  'GBP-3047','GBP-4158','GBP-5269','GBP-6370','GBP-7481','GBP-8592','GBP-9603','GBP-1714','GBP-2825','GBP-3936',
+  'GBP-4047','GBP-5158','GBP-6269','GBP-7370','GBP-8481','GBP-9592','GBP-1603','GBP-2714','GBP-3825','GBP-4936',
+  'GBP-5047','GBP-6158','GBP-7269','GBP-8370','GBP-9481','GBP-1592','GBP-2603','GBP-3714','GBP-4825','GBP-5936',
+  'GBP-6047','GBP-7158','GBP-8269','GBP-9370','GBP-1481','GBP-2592','GBP-3603','GBP-4714','GBP-5825','GBP-6936',
+  'GBP-7047','GBP-8158','GBP-9269','GBP-1370','GBP-2481','GBP-3592','GBP-4603','GBP-5714','GBP-6825','GBP-7936',
+  'GBP-8047','GBP-9158','GBP-1269','GBP-2370','GBP-3481','GBP-4592','GBP-5603','GBP-6714','GBP-7825','GBP-8936',
+  'GBP-9047','GBP-1158','GBP-2269','GBP-3370','GBP-4481','GBP-5592','GBP-6603','GBP-7714','GBP-8825','GBP-9936',
+  'GBP-1147','GBP-2258','GBP-3369','GBP-4470','GBP-5581','GBP-6692','GBP-7703','GBP-8814','GBP-9925','GBP-1016',
+  'GBP-2147','GBP-3258','GBP-4369','GBP-5470','GBP-6581','GBP-7692','GBP-8703','GBP-9814','GBP-1925','GBP-2016'
+];
+
+var ACT_KEY_P = 'gestorbase_activado_premium';
+
+function estaActivado() {
+  try { return !!localStorage.getItem(ACT_KEY_P); } catch(e) { return false; }
+}
+
+function activar(codigo) {
+  var cod = codigo.trim().toUpperCase();
+  if (CODIGOS_VALIDOS_P.indexOf(cod) !== -1) {
+    try { localStorage.setItem(ACT_KEY_P, cod); } catch(e) {}
+    return true;
+  }
+  return false;
+}
+
+if (!estaActivado()) {
+  document.getElementById('activacion-screen').classList.add('visible');
+}
+
+document.getElementById('act-btn').addEventListener('click', function() {
+  var cod = document.getElementById('act-input').value;
+  if (activar(cod)) {
+    document.getElementById('activacion-screen').classList.remove('visible');
+    var hayConfig = false;
+    try { hayConfig = !!localStorage.getItem(CONFIG_KEY); } catch(e) {}
+    if (!hayConfig) abrirConfig();
+  } else {
+    document.getElementById('act-error').style.display = 'block';
+  }
+});
+
+document.getElementById('act-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('act-btn').click();
+});
+
 var CONFIG_KEY = 'gestorbase_config';
 var CONFIG_DEFAULT = {
   negocio: 'Mi Negocio',
@@ -236,9 +321,11 @@ function verificarAlertaRespaldo() {
 }
 verificarAlertaRespaldo();
 
-var hayConfig = false;
-try { hayConfig = !!localStorage.getItem(CONFIG_KEY); } catch(e) {}
-if (!hayConfig) { abrirConfig(); }
+if (estaActivado()) {
+  var hayConfig = false;
+  try { hayConfig = !!localStorage.getItem(CONFIG_KEY); } catch(e) {}
+  if (!hayConfig) { abrirConfig(); }
+}
 
 document.getElementById('btnConfig').addEventListener('click', abrirConfig);
 document.getElementById('btnGuardar').addEventListener('click', guardarConfig);
