@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -20,8 +20,6 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 .modulo .icono { font-size: 2.5rem; margin-bottom: 10px; }
 .modulo .nombre { font-size: 0.95rem; font-weight: 600; }
 .modulo .desc { font-size: 0.75rem; color: #6b7280; margin-top: 4px; }
-.cfg-btn { display: block; margin: 0 auto 24px; background: none; border: 1.5px solid #e2e6f0; border-radius: 10px; padding: 12px 24px; font-size: 0.9rem; color: #6b7280; cursor: pointer; touch-action: manipulation; }
-/* Config screen */
 #config-screen { display: none; position: fixed; inset: 0; background: #f0f2f7; z-index: 200; overflow-y: auto; padding: 24px 16px; }
 #config-screen.visible { display: block; }
 #config-screen h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
@@ -38,9 +36,37 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 .btn-cancelar { width: 100%; padding: 13px; background: none; color: #6b7280; border: 1.5px solid #e2e6f0; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
 .alerta-respaldo { display: none; margin: 16px 20px 0; background: #fff3cd; border: 2px solid #e65100; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #b71c1c; font-weight: 600; cursor: pointer; }
 .alerta-respaldo span { display: block; font-size: 0.78rem; font-weight: 400; color: #5d4037; margin-top: 4px; }
+
+/* Pantalla de activación */
+#activacion-screen { display: none; position: fixed; inset: 0; background: #003b8e; z-index: 300; overflow-y: auto; padding: 40px 24px; align-items: center; justify-content: center; flex-direction: column; }
+#activacion-screen.visible { display: flex; }
+.act-logo { font-size: 3rem; text-align: center; margin-bottom: 12px; }
+.act-titulo { color: white; font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.act-sub { color: rgba(255,255,255,0.7); font-size: 0.9rem; text-align: center; margin-bottom: 32px; }
+.act-card { background: white; border-radius: 14px; padding: 28px 20px; width: 100%; max-width: 380px; }
+.act-card label { display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.act-card input { width: 100%; padding: 14px 16px; border: 2px solid #e2e6f0; border-radius: 10px; font-size: 1.1rem; font-family: monospace; color: #1a1a2e; text-align: center; text-transform: uppercase; letter-spacing: 2px; outline: none; }
+.act-card input:focus { border-color: #003b8e; }
+.act-error { color: #dc2626; font-size: 0.85rem; text-align: center; margin-top: 10px; display: none; }
+.act-btn { width: 100%; padding: 14px; background: #003b8e; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 16px; touch-action: manipulation; }
+.act-ayuda { color: rgba(255,255,255,0.6); font-size: 0.78rem; text-align: center; margin-top: 20px; }
 </style>
 </head>
 <body ontouchstart="">
+
+<!-- Pantalla de activación -->
+<div id="activacion-screen">
+  <div class="act-logo">📦</div>
+  <div class="act-titulo">GestorBase</div>
+  <div class="act-sub">Plan Básico</div>
+  <div class="act-card">
+    <label>Ingresá tu código de activación</label>
+    <input type="text" id="act-input" placeholder="GB-0000" maxlength="7" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+    <div class="act-error" id="act-error">Código incorrecto. Revisá el email que recibiste.</div>
+    <button class="act-btn" id="act-btn">Activar</button>
+  </div>
+  <div class="act-ayuda">¿No tenés el código? Respondé el email de compra.</div>
+</div>
 
 <!-- Pantalla de configuración -->
 <div id="config-screen">
@@ -111,6 +137,62 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 </div>
 
 <script>
+var CODIGOS_VALIDOS = [
+  'GB-1837','GB-2946','GB-3051','GB-4162','GB-5273','GB-6384','GB-7495','GB-8506','GB-9617','GB-1028',
+  'GB-2139','GB-3240','GB-4351','GB-5462','GB-6573','GB-7684','GB-8795','GB-9806','GB-1097','GB-2108',
+  'GB-3219','GB-4320','GB-5431','GB-6542','GB-7653','GB-8764','GB-9875','GB-1986','GB-2057','GB-3168',
+  'GB-4279','GB-5380','GB-6491','GB-7502','GB-8613','GB-9724','GB-1835','GB-2946','GB-3017','GB-4128',
+  'GB-5239','GB-6340','GB-7451','GB-8562','GB-9673','GB-1784','GB-2895','GB-3906','GB-4017','GB-5128',
+  'GB-6239','GB-7340','GB-8451','GB-9562','GB-1673','GB-2784','GB-3895','GB-4906','GB-5017','GB-6128',
+  'GB-7239','GB-8340','GB-9451','GB-1562','GB-2673','GB-3784','GB-4895','GB-5906','GB-6017','GB-7128',
+  'GB-8239','GB-9340','GB-1451','GB-2562','GB-3673','GB-4784','GB-5895','GB-6906','GB-7017','GB-8128',
+  'GB-9239','GB-1340','GB-2451','GB-3562','GB-4673','GB-5784','GB-6895','GB-7906','GB-8017','GB-9128',
+  'GB-1239','GB-2340','GB-3451','GB-4562','GB-5673','GB-6784','GB-7895','GB-8906','GB-9017','GB-1128',
+  'GB-3748','GB-4859','GB-5960','GB-6071','GB-7182','GB-8293','GB-9304','GB-1415','GB-2526','GB-3637',
+  'GB-4748','GB-5859','GB-6960','GB-7071','GB-8182','GB-9293','GB-1304','GB-2415','GB-3526','GB-4637',
+  'GB-5748','GB-6859','GB-7960','GB-8071','GB-9182','GB-1293','GB-2304','GB-3415','GB-4526','GB-5637',
+  'GB-6748','GB-7859','GB-8960','GB-9071','GB-1182','GB-2293','GB-3304','GB-4415','GB-5526','GB-6637',
+  'GB-7748','GB-8859','GB-9960','GB-1071','GB-2182','GB-3293','GB-4304','GB-5415','GB-6526','GB-7637',
+  'GB-8748','GB-9859','GB-1960','GB-2071','GB-3182','GB-4293','GB-5304','GB-6415','GB-7526','GB-8637',
+  'GB-9748','GB-1859','GB-2960','GB-3071','GB-4182','GB-5293','GB-6304','GB-7415','GB-8526','GB-9637',
+  'GB-1748','GB-2859','GB-3960','GB-4071','GB-5182','GB-6293','GB-7304','GB-8415','GB-9526','GB-1637',
+  'GB-2748','GB-3859','GB-4960','GB-5071','GB-6182','GB-7293','GB-8304','GB-9415','GB-1526','GB-2637',
+  'GB-3867','GB-4978','GB-5089','GB-6190','GB-7201','GB-8312','GB-9423','GB-1534','GB-2645','GB-3756'
+];
+
+var ACT_KEY = 'gestorbase_activado_basico';
+
+function estaActivado() {
+  try { return !!localStorage.getItem(ACT_KEY); } catch(e) { return false; }
+}
+
+function activar(codigo) {
+  var cod = codigo.trim().toUpperCase();
+  if (CODIGOS_VALIDOS.indexOf(cod) !== -1) {
+    try { localStorage.setItem(ACT_KEY, cod); } catch(e) {}
+    return true;
+  }
+  return false;
+}
+
+if (!estaActivado()) {
+  document.getElementById('activacion-screen').classList.add('visible');
+}
+
+document.getElementById('act-btn').addEventListener('click', function() {
+  var cod = document.getElementById('act-input').value;
+  if (activar(cod)) {
+    document.getElementById('activacion-screen').classList.remove('visible');
+    if (!savedConfig.negocio) abrirConfig();
+  } else {
+    document.getElementById('act-error').style.display = 'block';
+  }
+});
+
+document.getElementById('act-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('act-btn').click();
+});
+
 var CONFIG_KEY = 'gestorbase_config';
 var CONFIG_DEFAULT = {
   negocio: 'Mi Negocio',
@@ -147,7 +229,6 @@ function abrirConfig() {
 
 document.getElementById('btn-guardar-config').addEventListener('click', function() {
   var negocio = document.getElementById('cfg-negocio').value.trim();
-  var url = document.getElementById('cfg-url').value.trim();
   if (!negocio) {
     alert('Completá el nombre de tu negocio para continuar.');
     return;
@@ -170,7 +251,7 @@ document.getElementById('btn-guardar-config').addEventListener('click', function
   if (!categorias.length) categorias = ['Otros'];
   var nuevaConfig = {
     negocio: negocio,
-    urlSheet: url,
+    urlSheet: document.getElementById('cfg-url').value.trim(),
     colorPrincipal: document.getElementById('cfg-color1').value,
     colorAccent: document.getElementById('cfg-color2').value,
     empleados: empleados,
@@ -188,7 +269,7 @@ document.getElementById('btn-cancelar-config').addEventListener('click', functio
   document.getElementById('config-screen').className = '';
 });
 
-if (!savedConfig.negocio) {
+if (estaActivado() && !savedConfig.negocio) {
   abrirConfig();
 }
 
