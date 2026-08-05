@@ -102,7 +102,7 @@ textarea{resize:vertical;min-height:70px;}
 
 <!-- Header -->
 <header>
-  <a href="index.html" class="nav-btn">←</a>
+  <a href="#" onclick="history.back();return false;" class="nav-btn">←</a>
   <span style="font-size:1.4rem">📅</span>
   <h1 id="header-title">Agenda</h1>
   <button class="cfg-header-btn" id="btn-abrir-config">⚙️</button>
@@ -205,7 +205,7 @@ textarea{resize:vertical;min-height:70px;}
 
 <script>
 history.pushState(null, '', window.location.href);
-window.addEventListener('popstate', function() { window.location.href = 'index.html'; });
+window.addEventListener('popstate', function() { history.back(); });
 
 /* ── CONFIG ── */
 var CONFIG_KEY = 'gestorbase_config';
