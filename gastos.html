@@ -110,6 +110,9 @@ header h1 { flex:1; font-size:1.05rem; font-weight:600; }
 </div>
 
 <script>
+history.pushState(null, '', window.location.href);
+window.addEventListener('popstate', function() { window.location.href = 'index.html'; });
+
 var CONFIG_KEY = 'gestorbase_config';
 var CONFIG_DEFAULT = { negocio:'Mi Negocio', colorPrincipal:'#003b8e', colorAccent:'#0057d9', urlSheet:'', empleados:['Empleado 1','Empleado 2','Empleado 3'], categorias:['Insumos','Servicios','Sueldos','Alquiler','Mantenimiento','Otros'] };
 var savedConfig = {};
