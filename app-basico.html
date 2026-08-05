@@ -34,6 +34,10 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 .btn-cfg { width: 100%; padding: 13px; background: var(--accent, #0057d9); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
 .config-logo { font-size: 2rem; text-align: center; margin-bottom: 8px; }
 .btn-cancelar { width: 100%; padding: 13px; background: none; color: #6b7280; border: 1.5px solid #e2e6f0; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
+.btn-backup { width: 100%; padding: 13px; background: none; color: #003b8e; border: 1.5px solid #003b8e; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
+.btn-restaurar { width: 100%; padding: 13px; background: none; color: #6b7280; border: 1.5px solid #e2e6f0; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 6px; touch-action: manipulation; }
+.backup-section { margin-top: 20px; border-top: 1px solid #e2e6f0; padding-top: 16px; }
+.backup-section p { font-size: 0.8rem; color: #6b7280; margin-bottom: 10px; }
 .alerta-respaldo { display: none; margin: 16px 20px 0; background: #fff3cd; border: 2px solid #e65100; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #b71c1c; font-weight: 600; cursor: pointer; }
 .alerta-respaldo span { display: block; font-size: 0.78rem; font-weight: 400; color: #5d4037; margin-top: 4px; }
 
@@ -102,6 +106,12 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
     </div>
     <button class="btn-cfg" id="btn-guardar-config">Guardar y continuar</button>
     <button class="btn-cancelar" id="btn-cancelar-config">Cancelar</button>
+    <div class="backup-section">
+      <p>💾 Guardá una copia de seguridad de todos tus datos para no perderlos si cambiás de celular o reinstalás la app.</p>
+      <button class="btn-backup" id="btn-exportar">⬇ Exportar backup</button>
+      <button class="btn-restaurar" id="btn-importar">⬆ Restaurar backup</button>
+      <input type="file" id="inp-importar" accept=".json" style="display:none">
+    </div>
   </div>
 </div>
 
@@ -137,6 +147,9 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 </div>
 
 <script>
+history.pushState(null, '', window.location.href);
+window.addEventListener('popstate', function() { history.pushState(null, '', window.location.href); });
+
 var CODIGOS_VALIDOS = [
   'GB-1837','GB-2946','GB-3051','GB-4162','GB-5273','GB-6384','GB-7495','GB-8506','GB-9617','GB-1028',
   'GB-2139','GB-3240','GB-4351','GB-5462','GB-6573','GB-7684','GB-8795','GB-9806','GB-1097','GB-2108',
@@ -292,6 +305,53 @@ function verificarAlertaRespaldo() {
   }
 }
 verificarAlertaRespaldo();
+
+document.getElementById('btn-exportar').addEventListener('click', function() {
+  var neg = CONFIG.negocio.replace(/\s+/g,'_');
+  var backup = {
+    version: 1,
+    fecha: new Date().toISOString(),
+    config: localStorage.getItem('gestorbase_config'),
+    agenda: localStorage.getItem('gestorbase_agenda_' + neg),
+    gastos: localStorage.getItem('gestorbase_gastos_' + neg),
+    activacion: localStorage.getItem('gestorbase_activado_basico')
+  };
+  var blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'gestorbase-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btn-importar').addEventListener('click', function() {
+  document.getElementById('inp-importar').click();
+});
+
+document.getElementById('inp-importar').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var backup = JSON.parse(ev.target.result);
+      if (!backup.version || !backup.config) { alert('El archivo no es un backup válido de GestorBase.'); return; }
+      if (!confirm('¿Restaurar el backup? Esto va a reemplazar todos los datos actuales.')) return;
+      var cfg = JSON.parse(backup.config);
+      var neg = cfg.negocio.replace(/\s+/g,'_');
+      if (backup.config) localStorage.setItem('gestorbase_config', backup.config);
+      if (backup.agenda) localStorage.setItem('gestorbase_agenda_' + neg, backup.agenda);
+      if (backup.gastos) localStorage.setItem('gestorbase_gastos_' + neg, backup.gastos);
+      if (backup.activacion) localStorage.setItem('gestorbase_activado_basico', backup.activacion);
+      alert('Backup restaurado correctamente.');
+      location.reload();
+    } catch(err) {
+      alert('Error al leer el archivo. Asegurate de que sea un backup de GestorBase.');
+    }
+  };
+  reader.readAsText(file);
+});
 </script>
 </body>
 </html>
