@@ -92,7 +92,7 @@ header h1 { flex:1; font-size:1.05rem; font-weight:600; }
 
 <header>
   <div class="header-top-row">
-    <a href="index-premium.html" class="nav-btn">←</a>
+    <a href="#" onclick="history.back();return false;" class="nav-btn">←</a>
     <h1 id="header-saludo">Buenos días</h1>
     <button class="cfg-header-btn" id="btn-abrir-config">⚙️</button>
   </div>
@@ -138,6 +138,9 @@ header h1 { flex:1; font-size:1.05rem; font-weight:600; }
 </div>
 
 <script>
+history.pushState(null, '', window.location.href);
+window.addEventListener('popstate', function() { history.back(); });
+
 var CONFIG_KEY = 'gestorbase_config';
 var CONFIG_DEFAULT = { negocio:'Mi Negocio', colorPrincipal:'#003b8e', colorAccent:'#0057d9', urlSheet:'', empleados:['Empleado 1','Empleado 2','Empleado 3'], categorias:['Insumos','Servicios','Sueldos','Alquiler','Mantenimiento','Otros'] };
 var savedConfig = {};
