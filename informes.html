@@ -138,7 +138,7 @@ document.getElementById('btn-cancelar-config').addEventListener('click', functio
 document.getElementById('btn-guardar-config').addEventListener('click', function(){
   var negocio = document.getElementById('cfg-negocio').value.trim();
   var url = document.getElementById('cfg-url').value.trim();
-  if (!negocio || !url) { alert('Completá el nombre del negocio y la URL de la planilla.'); return; }
+  if (!negocio) { alert('Completá el nombre del negocio.'); return; }
   var empleados = document.getElementById('cfg-empleados').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
   var categorias = document.getElementById('cfg-categorias').value.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
   if (!empleados.length) empleados = CONFIG_DEFAULT.empleados;
