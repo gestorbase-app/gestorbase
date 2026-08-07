@@ -77,7 +77,7 @@ tr:last-child td { border-bottom:none; }
 </div>
 
 <header>
-  <a href="#" onclick="history.back();return false;" class="nav-btn">←</a>
+  <a href="#" onclick="location.href=sessionStorage.getItem('gestorbase_returnTo')||'app-basico.html';return false;" class="nav-btn">←</a>
   <span style="font-size:1.4rem">📊</span>
   <h1 id="header-title">Informes</h1>
   <button class="cfg-header-btn" id="btn-abrir-config">⚙️</button>
