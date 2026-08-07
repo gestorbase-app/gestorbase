@@ -268,7 +268,6 @@ function renderInforme(data, esOffline) {
     '<div class="card azul"><div class="label">Turnos</div><div class="valor">' + cantTurnos + '</div></div>' +
     '</div>';
   if (esOffline) {
-    html += '<p class="error-banner">Sin conexión a la planilla. Mostrando datos guardados localmente.</p>';
   }
   if (listaTurnos.length > 0) {
     html += '<div class="seccion"><h3>Turnos del período</h3><div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Servicio</th><th>Monto</th></tr></thead><tbody>';
