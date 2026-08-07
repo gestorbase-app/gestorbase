@@ -371,6 +371,10 @@ body {
 .garantia { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.45); }
 
 footer { background: var(--carbon); padding: 24px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.3); }
+
+.btn-grupo-precios { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.btn-precio-hotmart { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); font-size: 13px; padding: 11px 20px; }
+.btn-precio-hotmart:hover { background: rgba(255,255,255,0.15); }
 </style>
 <script>
 function abrirFaq(btn) {
@@ -877,7 +881,7 @@ function abrirFaq(btn) {
           <li><span>✓</span> Resumen general del negocio</li>
           <li><span>✓</span> 6 módulos en total</li>
         </ul>
-        <a href="#" class="btn-precio btn-precio-premium">Quiero el Premium →</a>
+        <div class="btn-grupo-precios"><a href="https://mpago.la/2JL131s" class="btn-precio btn-precio-premium" target="_blank">Quiero el Premium — Mercado Pago →</a><a href="https://gestorbaseapp.hotmart.host/gestorbase-premium-d5e71595-2a55-43c9-bb65-22c427bc8a85" class="btn-precio btn-precio-hotmart" target="_blank">Pagar con Hotmart →</a></div>
       </div>
 
       <div class="precio-card-basico">
@@ -890,7 +894,7 @@ function abrirFaq(btn) {
           <li><span>✓</span> Módulo Informes</li>
           <li><span>✓</span> Guía para conectar tu Google Sheet</li>
         </ul>
-        <a href="#" class="btn-precio">Quiero el Básico →</a>
+        <div class="btn-grupo-precios"><a href="https://mpago.la/1ReHuLG" class="btn-precio" target="_blank">Quiero el Básico — Mercado Pago →</a><a href="https://go.hotmart.com/J107033690O" class="btn-precio btn-precio-hotmart" target="_blank">Pagar con Hotmart →</a></div>
       </div>
     </div>
     <p class="precio-nota">Precios en pesos argentinos · Pago único · Acceso inmediato</p>
