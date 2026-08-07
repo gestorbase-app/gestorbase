@@ -172,10 +172,11 @@ function fmt(n) { return '$' + Number(n||0).toLocaleString('es-AR'); }
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function getLocalData() {
-  var neg = CONFIG.negocio.replace(/\s+/g,'_');
+  var negAgenda = CONFIG.negocio;
+  var negGastos = CONFIG.negocio.replace(/\s+/g,'_');
   var agenda = []; var gastos = [];
-  try { agenda = JSON.parse(localStorage.getItem('gestorbase_agenda_' + neg) || '[]'); } catch(e){}
-  try { gastos = JSON.parse(localStorage.getItem('gestorbase_gastos_' + neg) || '[]'); } catch(e){}
+  try { agenda = JSON.parse(localStorage.getItem('gestorbase_agenda_' + negAgenda) || '[]'); } catch(e){}
+  try { gastos = JSON.parse(localStorage.getItem('gestorbase_gastos_' + negGastos) || '[]'); } catch(e){}
   return { agenda: agenda, gastos: gastos };
 }
 
