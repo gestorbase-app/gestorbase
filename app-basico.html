@@ -129,17 +129,17 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 </div>
 
 <div class="grid">
-  <a class="modulo" href="agenda.html">
+  <a class="modulo" href="agenda.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-basico.html')">
     <div class="icono">📅</div>
     <div class="nombre">Agenda</div>
     <div class="desc">Turnos y calendario</div>
   </a>
-  <a class="modulo" href="gastos.html">
+  <a class="modulo" href="gastos.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-basico.html')">
     <div class="icono">💰</div>
     <div class="nombre">Gastos</div>
     <div class="desc">Registrá tus gastos</div>
   </a>
-  <a class="modulo" href="informes.html" style="grid-column: span 2;">
+  <a class="modulo" href="informes.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-basico.html')" style="grid-column: span 2;">
     <div class="icono">📊</div>
     <div class="nombre">Informes</div>
     <div class="desc">Resumen del período</div>
