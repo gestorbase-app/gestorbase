@@ -82,7 +82,7 @@ header h1 { flex:1; font-size:1.05rem; font-weight:600; }
 </div>
 
 <header>
-  <a href="#" onclick="location.href=localStorage.getItem('gestorbase_returnTo')||'app-basico.html';return false;" class="nav-btn">←</a>
+  <a href="#" onclick="location.href=localStorage.getItem('gestorbase_returnTo')||(localStorage.getItem('gestorbase_activado_premium')?'app-premium.html':'app-basico.html');return false;" class="nav-btn">←</a>
   <span style="font-size:1.4rem">💼</span>
   <h1 id="header-title">Liquidación</h1>
   <button class="cfg-header-btn" id="btn-abrir-config">⚙️</button>
