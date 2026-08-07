@@ -231,7 +231,12 @@ function cargarInforme() {
   var contenido = document.getElementById('contenido');
   contenido.innerHTML = '<p class="loading">Cargando...</p>';
   if (!CONFIG.urlSheet) {
-    contenido.innerHTML = '<p class="error-banner">Configurá la URL de la planilla en ⚙️ para ver informes en línea.</p>';
+    var local = getLocalData();
+    var turnos = filtrarPorMes(local.agenda, mes, anio, "fecha");
+    var gastos = filtrarPorMes(local.gastos, mes, anio, "fecha");
+    var totalIngresos = turnos.reduce(function(s,t){ return s+Number(t.monto||0); },0);
+    var totalGastos = gastos.reduce(function(s,g){ return s+Number(g.monto||0); },0);
+    renderInforme({ turnos: turnos, gastosList: gastos, ingresos: totalIngresos, gastos: totalGastos, balance: totalIngresos - totalGastos }, true);
     return;
   }
   var url = CONFIG.urlSheet + '?accion=informes&mes=' + mes + '&anio=' + anio;
