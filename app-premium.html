@@ -102,17 +102,17 @@
 <div style="height:16px;"></div>
 <div class="seccion-titulo">Plan Básico</div>
 <div class="grid" id="gridBasico">
-  <a class="card" href="agenda.html">
+  <a class="card" href="agenda.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-premium.html')">
     <div class="icono">📅</div>
     <div class="nombre">Agenda</div>
     <div class="desc">Turnos y calendario del negocio</div>
   </a>
-  <a class="card" href="gastos.html">
+  <a class="card" href="gastos.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-premium.html')">
     <div class="icono">💸</div>
     <div class="nombre">Gastos</div>
     <div class="desc">Registrá y controlá tus gastos</div>
   </a>
-  <a class="card" href="informes.html" style="grid-column: span 2;">
+  <a class="card" href="informes.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-premium.html')" style="grid-column: span 2;">
     <div class="icono">📊</div>
     <div class="nombre">Informes</div>
     <div class="desc">Reportes mensuales y análisis</div>
@@ -121,19 +121,19 @@
 
 <div class="seccion-titulo" style="margin-top:4px;">Módulos Premium</div>
 <div class="grid" id="gridPremium">
-  <a class="card premium" href="liquidacion.html">
+  <a class="card premium" href="liquidacion.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-premium.html')">
     <div class="icono">💰</div>
     <div class="nombre">Liquidación</div>
     <div class="desc">Comisiones y pagos de empleados</div>
     <span class="tag-premium">Premium</span>
   </a>
-  <a class="card premium" href="buscador.html">
+  <a class="card premium" href="buscador.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-premium.html')">
     <div class="icono">🔍</div>
     <div class="nombre">Buscador</div>
     <div class="desc">Encontrá cualquier registro rápido</div>
     <span class="tag-premium">Premium</span>
   </a>
-  <a class="card premium" href="resumen.html" style="grid-column: span 2;">
+  <a class="card premium" href="resumen.html" onclick="sessionStorage.setItem('gestorbase_returnTo','app-premium.html')" style="grid-column: span 2;">
     <div class="icono">🏠</div>
     <div class="nombre">Resumen</div>
     <div class="desc">Dashboard general del negocio</div>
