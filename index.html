@@ -450,48 +450,365 @@ function abrirFaq(btn) {
   <a href="#comprar" class="btn-principal">Quiero organizar mi negocio →</a>
 </div>
 
-<section class="video-section">
+<section class="video-section" id="demo-section">
   <h2>Mirá cómo funciona en 30 segundos</h2>
-  <p>El sistema real, desde un celular. Con audio narrado.</p>
-  <div style="display:flex;justify-content:center;margin:32px 0 20px;position:relative;width:fit-content;margin-left:auto;margin-right:auto;">
-    <div style="width:148px;background:#0d1a18;border-radius:36px;padding:8px;box-shadow:0 28px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.07),0 0 40px rgba(46,175,150,0.1);">
-      <div style="width:32px;height:4px;background:#1a1a1a;border-radius:2px;margin:6px auto 0;"></div>
-      <div style="background:#F2F8F6;border-radius:28px;overflow:hidden;min-height:280px;">
-        <div style="background:#1B6F5F;padding:9px 10px 8px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="min-width:16px"></div>
-          <div style="text-align:center;">
-            <div style="font-size:9px;font-weight:800;color:white;">Mi Negocio</div>
-            <div style="font-size:6px;color:rgba(255,255,255,0.6);">Plan Básico — GestorBase</div>
+  <p id="demo-caption-top">El sistema real, desde un celular. Con audio narrado.</p>
+
+  <!-- Audio elements -->
+  <audio id="da0" src="demo-voz1.mp3" preload="auto"></audio>
+  <audio id="da1" src="demo-voz2.mp3" preload="auto"></audio>
+  <audio id="da2" src="demo-voz3.mp3" preload="auto"></audio>
+  <audio id="da3" src="demo-voz4.mp3" preload="auto"></audio>
+  <audio id="da4" src="demo-voz5.mp3" preload="auto"></audio>
+  <audio id="da5" src="demo-voz6.mp3" preload="auto"></audio>
+  <audio id="da6" src="demo-voz7.mp3" preload="auto"></audio>
+  <audio id="da7" src="demo-voz8.mp3" preload="auto"></audio>
+  <audio id="da8" src="demo-voz9.mp3" preload="auto"></audio>
+  <audio id="da9" src="demo-voz10.wav" preload="auto"></audio>
+  <audio id="da10" src="demo-voz11.mp3" preload="auto"></audio>
+  <audio id="da11" src="demo-voz12.mp3" preload="auto"></audio>
+  <audio id="da12" src="demo-voz13.mp3" preload="auto"></audio>
+  <audio id="dmusic" src="demo-music.mp3" loop preload="auto"></audio>
+
+  <style>
+  .demo-phone-wrap { position:relative; display:flex; justify-content:center; margin:28px 0 20px; }
+  .demo-phone { width:148px; background:#0d1a18; border-radius:36px; padding:8px; box-shadow:0 28px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.07),0 0 40px rgba(46,175,150,0.1); }
+  .demo-notch { width:32px; height:4px; background:#1a1a1a; border-radius:2px; margin:6px auto 0; }
+  .demo-screen { background:#F2F8F6; border-radius:28px; overflow:hidden; min-height:280px; position:relative; }
+  .demo-scene { position:absolute; inset:0; opacity:0; transition:opacity 0.35s; pointer-events:none; display:flex; flex-direction:column; overflow:hidden; }
+  .demo-scene.activa { opacity:1; }
+  .demo-hdr { padding:9px 10px 8px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .demo-hdr-c { text-align:center; flex:1; }
+  .demo-hdr-t { font-size:9px; font-weight:800; color:white; }
+  .demo-hdr-s { font-size:6px; color:rgba(255,255,255,0.6); margin-top:1px; }
+  .demo-hdr-btn { font-size:9px; background:rgba(255,255,255,0.2); border-radius:4px; padding:2px 4px; }
+  .demo-hdr-back { font-size:9px; color:rgba(255,255,255,0.85); font-weight:700; min-width:16px; }
+  .demo-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:8px; flex:1; }
+  .demo-card { background:white; border-radius:9px; padding:14px 4px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+  .demo-card.span2 { grid-column:span 2; }
+  .demo-card-ico { font-size:18px; margin-bottom:3px; }
+  .demo-card-nom { font-size:8px; font-weight:800; color:#1E2E2B; }
+  .demo-card-des { font-size:6px; color:#5a7a74; margin-top:1px; }
+  .demo-form { padding:8px 10px; display:flex; flex-direction:column; gap:5px; flex:1; overflow:hidden; }
+  .demo-lbl { font-size:7px; font-weight:700; color:#5a7a74; text-transform:uppercase; }
+  .demo-inp { background:white; border:1.5px solid #d0e8e2; border-radius:5px; padding:5px 7px; font-size:9px; color:#1E2E2B; font-weight:600; min-height:22px; }
+  .demo-btn { background:#2EAF96; color:white; border:none; border-radius:6px; padding:7px; font-size:9px; font-weight:800; width:100%; margin-top:2px; }
+  .demo-btn.ok { background:#1B6F5F; }
+  .demo-stat { display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-bottom:1px solid #d0e8e2; }
+  .demo-stat-lbl { font-size:8px; color:#5a7a74; }
+  .demo-stat-val { font-size:10px; font-weight:800; }
+  .demo-periodo { background:#1B6F5F; border-radius:8px; padding:8px 10px; text-align:center; margin:8px; flex-shrink:0; }
+  .demo-periodo-lbl { font-size:7px; color:rgba(255,255,255,0.7); }
+  .demo-periodo-val { font-size:11px; font-weight:800; color:white; }
+  .demo-sec-lbl { font-size:7px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#5a7a74; padding:6px 8px 2px; }
+  .demo-sec-lbl.prem { color:#FF6B47; }
+
+  .demo-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(13,26,24,0.42); border-radius:28px; cursor:pointer; transition:background 0.2s; }
+  .demo-overlay:hover { background:rgba(13,26,24,0.28); }
+  .demo-play-circle { width:52px; height:52px; border-radius:50%; background:white; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+  .demo-play-tri { width:0; height:0; border-style:solid; border-width:8px 0 8px 15px; border-color:transparent transparent transparent #1B6F5F; margin-left:3px; }
+
+  .demo-ctrl { text-align:center; margin-top:4px; }
+  .demo-pause-btn { display:none; background:none; border:1.5px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.7); padding:8px 20px; border-radius:50px; font-size:13px; cursor:pointer; }
+  .demo-pause-btn:hover { background:rgba(255,255,255,0.1); }
+
+  .demo-dots { display:flex; justify-content:center; gap:5px; margin-top:10px; }
+  .demo-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.2); transition:background 0.3s; }
+  .demo-dot.activo { background:#2EAF96; }
+  .demo-dot.prem.activo { background:#FF6B47; }
+  </style>
+
+  <div class="demo-phone-wrap">
+    <div class="demo-phone">
+      <div class="demo-notch"></div>
+      <div class="demo-screen" id="demo-screen">
+
+        <!-- SC0: Básico home -->
+        <div class="demo-scene activa" id="dsc0">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div style="min-width:16px"></div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">Mi Negocio</div><div class="demo-hdr-s">Plan Básico — GestorBase</div></div>
+            <div class="demo-hdr-btn">⚙️</div>
           </div>
-          <div style="font-size:9px;background:rgba(255,255,255,0.15);border-radius:4px;padding:2px 4px;">⚙️</div>
+          <div class="demo-grid">
+            <div class="demo-card"><div class="demo-card-ico">📅</div><div class="demo-card-nom">Agenda</div><div class="demo-card-des">Turnos</div></div>
+            <div class="demo-card"><div class="demo-card-ico">💰</div><div class="demo-card-nom">Gastos</div><div class="demo-card-des">Registros</div></div>
+            <div class="demo-card span2"><div class="demo-card-ico">📊</div><div class="demo-card-nom">Informes</div><div class="demo-card-des">Resumen del período</div></div>
+          </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;">
-          <div style="background:white;border-radius:9px;padding:14px 4px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-            <div style="font-size:18px;margin-bottom:3px;">📅</div>
-            <div style="font-size:8px;font-weight:800;color:#1E2E2B;">Agenda</div>
-            <div style="font-size:6px;color:#5a7a74;margin-top:1px;">Turnos</div>
+
+        <!-- SC1: Config -->
+        <div class="demo-scene" id="dsc1">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div style="min-width:16px"></div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">⚙️ Configuración</div></div>
+            <div style="min-width:16px"></div>
           </div>
-          <div style="background:white;border-radius:9px;padding:14px 4px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-            <div style="font-size:18px;margin-bottom:3px;">💰</div>
-            <div style="font-size:8px;font-weight:800;color:#1E2E2B;">Gastos</div>
-            <div style="font-size:6px;color:#5a7a74;margin-top:1px;">Registros</div>
-          </div>
-          <div style="background:white;border-radius:9px;padding:14px 4px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.06);grid-column:span 2;">
-            <div style="font-size:18px;margin-bottom:3px;">📊</div>
-            <div style="font-size:8px;font-weight:800;color:#1E2E2B;">Informes</div>
-            <div style="font-size:6px;color:#5a7a74;margin-top:1px;">Resumen del período</div>
+          <div class="demo-form">
+            <div class="demo-lbl">Nombre del negocio</div>
+            <div class="demo-inp" id="dcfg-nombre">Peluquería Carla</div>
+            <div class="demo-lbl">Color principal</div>
+            <div class="demo-inp" style="background:#1B6F5F;height:18px;border-radius:4px;"></div>
+            <div class="demo-btn ok" id="dcfg-btn">✓ Guardado</div>
           </div>
         </div>
-        <div style="height:40px;"></div>
-      </div>
-    </div>
-    <a href="demo.html" target="_blank" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(13,26,24,0.42);border-radius:36px;text-decoration:none;">
-      <div style="width:52px;height:52px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
-        <div style="width:0;height:0;border-style:solid;border-width:8px 0 8px 15px;border-color:transparent transparent transparent #1B6F5F;margin-left:3px;"></div>
-      </div>
-    </a>
+
+        <!-- SC2: Agenda form -->
+        <div class="demo-scene" id="dsc2">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">📅 Agenda</div><div class="demo-hdr-s">Peluquería Carla</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div class="demo-form">
+            <div class="demo-lbl">Cliente</div>
+            <div class="demo-inp" id="dag-cli">María González</div>
+            <div class="demo-lbl">Servicio</div>
+            <div class="demo-inp" id="dag-ser">Corte + Peinado</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+              <div><div class="demo-lbl">Empleada</div><div class="demo-inp">Sofía</div></div>
+              <div><div class="demo-lbl">Hora</div><div class="demo-inp" id="dag-hora">14:30</div></div>
+            </div>
+            <div class="demo-btn" id="dag-btn">Guardar turno</div>
+          </div>
+        </div>
+
+        <!-- SC3: Agenda guardada -->
+        <div class="demo-scene" id="dsc3">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">📅 Agenda</div><div class="demo-hdr-s">Peluquería Carla</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div class="demo-form">
+            <div class="demo-lbl">Cliente</div><div class="demo-inp">María González</div>
+            <div class="demo-lbl">Servicio</div><div class="demo-inp">Corte + Peinado</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+              <div><div class="demo-lbl">Empleada</div><div class="demo-inp">Sofía</div></div>
+              <div><div class="demo-lbl">Hora</div><div class="demo-inp">14:30</div></div>
+            </div>
+            <div class="demo-btn ok">✓ Llegó a tu Google Sheets</div>
+          </div>
+        </div>
+
+        <!-- SC4: Gastos form -->
+        <div class="demo-scene" id="dsc4">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">💰 Gastos</div><div class="demo-hdr-s">Peluquería Carla</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div class="demo-form">
+            <div class="demo-lbl">Descripción</div><div class="demo-inp">Tinte rubio</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+              <div><div class="demo-lbl">Monto</div><div class="demo-inp">$4.800</div></div>
+              <div><div class="demo-lbl">Categoría</div><div class="demo-inp">Insumos</div></div>
+            </div>
+            <div class="demo-btn" id="dgs-btn">Guardar gasto</div>
+          </div>
+        </div>
+
+        <!-- SC5: Sin señal -->
+        <div class="demo-scene" id="dsc5">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">💰 Gastos</div><div class="demo-hdr-s">Peluquería Carla</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div style="background:#fff8e1;padding:6px 10px;font-size:8px;font-weight:700;color:#5d4037;border-bottom:1px solid #ffc107;">💾 Sin conexión — guardado en el celular</div>
+          <div class="demo-form">
+            <div class="demo-lbl">Descripción</div><div class="demo-inp">Tinte rubio</div>
+            <div class="demo-btn ok">✓ Guardado localmente</div>
+          </div>
+        </div>
+
+        <!-- SC6: Sincronizado -->
+        <div class="demo-scene" id="dsc6">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">💰 Gastos</div><div class="demo-hdr-s">Peluquería Carla</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div style="background:#e8f5e9;padding:6px 10px;font-size:8px;font-weight:700;color:#1B5E20;border-bottom:1px solid #81c784;">✓ Conexión recuperada — sincronizando…</div>
+          <div class="demo-form">
+            <div class="demo-inp">Tinte rubio</div>
+            <div class="demo-btn ok">✓ Sincronizado con Google Sheets</div>
+          </div>
+        </div>
+
+        <!-- SC7: Informes -->
+        <div class="demo-scene" id="dsc7">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">📊 Informes</div><div class="demo-hdr-s">Peluquería Carla</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div class="demo-periodo"><div class="demo-periodo-lbl">Período</div><div class="demo-periodo-val">Julio 2026</div></div>
+          <div class="demo-stat"><span class="demo-stat-lbl">Total cobros</span><span class="demo-stat-val" style="color:#1B6F5F">$185.000</span></div>
+          <div class="demo-stat"><span class="demo-stat-lbl">Total gastos</span><span class="demo-stat-val" style="color:#FF6B47">$58.000</span></div>
+          <div class="demo-stat"><span class="demo-stat-lbl">Balance</span><span class="demo-stat-val" style="color:#1B6F5F">+$127.000</span></div>
+          <div class="demo-stat"><span class="demo-stat-lbl">Turnos</span><span class="demo-stat-val">47 turnos</span></div>
+        </div>
+
+        <!-- SC8: Premium home -->
+        <div class="demo-scene" id="dsc8">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div style="min-width:16px"></div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">Peluquería Carla</div><div class="demo-hdr-s">Plan Premium ⭐</div></div>
+            <div class="demo-hdr-btn">⚙️</div>
+          </div>
+          <div class="demo-sec-lbl">Módulos básicos</div>
+          <div class="demo-grid" style="padding-bottom:2px;gap:5px">
+            <div class="demo-card"><div class="demo-card-ico">📅</div><div class="demo-card-nom">Agenda</div></div>
+            <div class="demo-card"><div class="demo-card-ico">💰</div><div class="demo-card-nom">Gastos</div></div>
+            <div class="demo-card span2"><div class="demo-card-ico">📊</div><div class="demo-card-nom">Informes</div></div>
+          </div>
+          <div class="demo-sec-lbl prem">⭐ Premium</div>
+          <div class="demo-grid" style="padding-top:2px;gap:5px">
+            <div class="demo-card"><div class="demo-card-ico">💸</div><div class="demo-card-nom">Liquidación</div></div>
+            <div class="demo-card"><div class="demo-card-ico">🔍</div><div class="demo-card-nom">Buscador</div></div>
+            <div class="demo-card span2"><div class="demo-card-ico">🏠</div><div class="demo-card-nom">Resumen</div></div>
+          </div>
+        </div>
+
+        <!-- SC9: Liquidación -->
+        <div class="demo-scene" id="dsc9">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">💸 Liquidación</div><div class="demo-hdr-s">Peluquería Carla</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div class="demo-form" style="gap:6px">
+            <div class="demo-stat"><span class="demo-stat-lbl">Empleada</span><span class="demo-stat-val">Sofía</span></div>
+            <div class="demo-stat"><span class="demo-stat-lbl">Total cobros</span><span class="demo-stat-val">$185.000</span></div>
+            <div class="demo-stat"><span class="demo-stat-lbl">Comisión 50%</span><span class="demo-stat-val" style="color:#2EAF96" id="dliq-res">$92.500</span></div>
+            <div class="demo-btn ok" id="dliq-btn">✓ Calculado</div>
+          </div>
+        </div>
+
+        <!-- SC10: Buscador -->
+        <div class="demo-scene" id="dsc10">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">🔍 Buscador</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div class="demo-form" style="gap:7px">
+            <div class="demo-inp" style="display:flex;align-items:center;gap:4px;"><span>🔍</span><span>González</span></div>
+            <div class="demo-inp" style="background:#F2F8F6;font-size:8px;">María González · Corte · 14 jul · Sofía</div>
+            <div class="demo-inp" style="background:#F2F8F6;font-size:8px;">María González · Mechas · 02 jun · Laura</div>
+            <div class="demo-inp" style="background:#F2F8F6;font-size:8px;">María González · Corte · 18 may · Sofía</div>
+            <div style="text-align:center;font-size:8px;color:#5a7a74;">3 resultados encontrados</div>
+          </div>
+        </div>
+
+        <!-- SC11: Resumen -->
+        <div class="demo-scene" id="dsc11">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div class="demo-hdr-back">←</div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">🏠 Resumen</div><div class="demo-hdr-s">Julio 2026</div></div>
+            <div style="min-width:16px"></div>
+          </div>
+          <div class="demo-form" style="gap:6px;padding-top:8px">
+            <div style="background:#1B6F5F;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:8px;color:rgba(255,255,255,0.7);">Balance del mes</div><div style="font-size:16px;font-weight:800;color:white;">+$127.000</div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+              <div class="demo-inp" style="text-align:center;"><div style="font-size:11px;font-weight:800;color:#1B6F5F;">$185k</div><div style="font-size:7px;color:#5a7a74;">Cobros</div></div>
+              <div class="demo-inp" style="text-align:center;"><div style="font-size:11px;font-weight:800;color:#FF6B47;">$58k</div><div style="font-size:7px;color:#5a7a74;">Gastos</div></div>
+              <div class="demo-inp" style="text-align:center;"><div style="font-size:11px;font-weight:800;">47</div><div style="font-size:7px;color:#5a7a74;">Turnos</div></div>
+              <div class="demo-inp" style="text-align:center;"><div style="font-size:11px;font-weight:800;">3</div><div style="font-size:7px;color:#5a7a74;">Empleadas</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SC12: Cierre -->
+        <div class="demo-scene" id="dsc12">
+          <div class="demo-hdr" style="background:#1B6F5F">
+            <div style="min-width:16px"></div>
+            <div class="demo-hdr-c"><div class="demo-hdr-t">Peluquería Carla</div><div class="demo-hdr-s">Plan Básico — GestorBase</div></div>
+            <div class="demo-hdr-btn">⚙️</div>
+          </div>
+          <div class="demo-grid">
+            <div class="demo-card"><div class="demo-card-ico">📅</div><div class="demo-card-nom">Agenda</div><div class="demo-card-des">Turnos y calendario</div></div>
+            <div class="demo-card"><div class="demo-card-ico">💰</div><div class="demo-card-nom">Gastos</div><div class="demo-card-des">Registrá tus gastos</div></div>
+            <div class="demo-card span2"><div class="demo-card-ico">📊</div><div class="demo-card-nom">Informes</div><div class="demo-card-des">Resumen del período</div></div>
+          </div>
+        </div>
+
+        <!-- Play overlay -->
+        <div class="demo-overlay" id="demo-overlay" onclick="demoIniciar()">
+          <div class="demo-play-circle">
+            <div class="demo-play-tri"></div>
+          </div>
+        </div>
+
+      </div><!-- /demo-screen -->
+    </div><!-- /demo-phone -->
+  </div><!-- /demo-phone-wrap -->
+
+  <div class="demo-ctrl">
+    <button class="demo-pause-btn" id="demo-pause-btn" onclick="demoPausar()">⏸ Pausar</button>
   </div>
-  <p style="font-size:13px;opacity:0.55;margin-top:4px;">Tocá ▶ para ver el demo con audio narrado</p>
+
+  <div class="demo-dots" id="demo-dots">
+    <div class="demo-dot" id="dd0"></div><div class="demo-dot" id="dd1"></div>
+    <div class="demo-dot" id="dd2"></div><div class="demo-dot" id="dd3"></div>
+    <div class="demo-dot" id="dd4"></div><div class="demo-dot" id="dd5"></div>
+    <div class="demo-dot" id="dd6"></div><div class="demo-dot" id="dd7"></div>
+    <div class="demo-dot prem" id="dd8"></div><div class="demo-dot prem" id="dd9"></div>
+    <div class="demo-dot prem" id="dd10"></div><div class="demo-dot prem" id="dd11"></div>
+    <div class="demo-dot prem" id="dd12"></div>
+  </div>
+
+  <script>
+  (function(){
+    var total=13, actual=0, dActivo=false, dAud=null, dTimers=[];
+    function dT(fn,ms){var t=setTimeout(fn,ms);dTimers.push(t);return t;}
+    function dClear(){dTimers.forEach(clearTimeout);dTimers=[];}
+    function dMostrar(n){
+      document.getElementById('dsc'+actual).className='demo-scene';
+      document.getElementById('dd'+actual).className=actual>=8?'demo-dot prem':'demo-dot';
+      actual=n%total;
+      document.getElementById('dsc'+actual).className='demo-scene activa';
+      document.getElementById('dd'+actual).className=(actual>=8?'demo-dot prem':'demo-dot')+' activo';
+    }
+    function dPlayEscena(n){
+      if(!dActivo)return;
+      dClear();
+      dMostrar(n);
+      var el=document.getElementById('da'+n);
+      if(!el)return;
+      if(dAud){try{dAud.pause();dAud.currentTime=0;dAud.onended=null;}catch(e){}}
+      dAud=el;
+      el.currentTime=0;
+      el.onended=function(){if(dActivo){if(n+1<total){dPlayEscena(n+1);}else{dFin();}}};
+      el.play().catch(function(){});
+    }
+    function dFin(){
+      dActivo=false;
+      var mus=document.getElementById('dmusic');if(mus){mus.pause();mus.currentTime=0;}
+      document.getElementById('demo-pause-btn').style.display='none';
+      document.getElementById('demo-overlay').style.display='flex';
+    }
+    window.demoIniciar=function(){
+      if(dActivo)return;
+      dActivo=true;
+      document.getElementById('demo-overlay').style.display='none';
+      document.getElementById('demo-pause-btn').style.display='inline-block';
+      var mus=document.getElementById('dmusic');if(mus){mus.volume=0.18;mus.currentTime=0;mus.play().catch(function(){});}
+      actual=0;
+      dPlayEscena(0);
+    };
+    window.demoPausar=function(){
+      if(!dActivo)return;
+      dActivo=false;
+      dClear();
+      if(dAud){try{dAud.pause();}catch(e){}}
+      var mus=document.getElementById('dmusic');if(mus){mus.pause();}
+      document.getElementById('demo-pause-btn').style.display='none';
+      document.getElementById('demo-overlay').style.display='flex';
+    };
+  })();
+  </script>
 </section>
 
 <section class="que-recibes">
