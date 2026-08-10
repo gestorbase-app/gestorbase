@@ -90,7 +90,7 @@ header h1 { flex:1; font-size:1.05rem; font-weight:600; }
     <div class="form-group"><label>Responsable</label><select id="inp-emp"></select></div>
     <div class="form-group"><label>Notas (opcional)</label><textarea id="inp-notas" placeholder="Observaciones..." rows="2"></textarea></div>
     <div id="msg-form" class="msg"></div>
-    <button class="btn" onclick="guardarGasto()">Guardar gasto</button>
+    <button class="btn" id="btn-guardar-gasto" onclick="guardarGasto()">Guardar gasto</button>
   </div>
 
   <div>
@@ -128,7 +128,7 @@ var BORRAR_KEY = STORAGE_KEY + '_borrar_pendientes';
 function nuevoIdLocal() { return 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2,8); }
 
 function filaDesdeGasto(g) {
-  return [g.fecha, g.responsable, g.descripcion, g.categoria, g.monto, g.notas];
+  return [g.fecha, g.descripcion, g.categoria, g.monto, g.notas, g.responsable];
 }
 
 function mapGastosRow(row) {
@@ -232,6 +232,10 @@ function guardarGasto() {
   if (!fecha || !desc || !monto || monto <= 0) {
     msg.className='msg err'; msg.textContent='Completá fecha, descripción y monto.'; return;
   }
+  var btn = document.getElementById('btn-guardar-gasto');
+  if (btn.disabled) return;
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  function reactivarBoton() { btn.disabled = false; btn.textContent = 'Guardar gasto'; }
   var gasto = { id:nuevoIdLocal(), fecha:fecha, descripcion:desc, categoria:cat, monto:monto, responsable:emp, notas:notas, sincronizado:false };
   function limpiar() {
     document.getElementById('inp-desc').value = '';
@@ -241,7 +245,7 @@ function guardarGasto() {
   if (!CONFIG.urlSheet) {
     var arr = getGastos(); arr.push(gasto); saveGastos(arr);
     msg.className='msg ok'; msg.textContent='✅ Guardado localmente.';
-    actualizarBanner(); renderLista(); limpiar();
+    actualizarBanner(); renderLista(); limpiar(); reactivarBoton();
     return;
   }
   msg.className='msg'; msg.style.display='none';
@@ -249,11 +253,11 @@ function guardarGasto() {
     gasto.id = id; gasto.sincronizado = true;
     var arr = getGastos(); arr.push(gasto); saveGastos(arr);
     msg.className='msg ok'; msg.textContent='✅ Gasto guardado en la planilla.';
-    actualizarBanner(); renderLista(); limpiar();
+    actualizarBanner(); renderLista(); limpiar(); reactivarBoton();
   }).catch(function(){
     var arr = getGastos(); arr.push(gasto); saveGastos(arr);
     msg.className='msg err'; msg.textContent='Sin conexión. Guardado localmente. Sincronizá cuando vuelva Internet.';
-    actualizarBanner(); renderLista(); limpiar();
+    actualizarBanner(); renderLista(); limpiar(); reactivarBoton();
   });
 }
 

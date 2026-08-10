@@ -147,7 +147,7 @@ textarea{resize:vertical;min-height:70px;}
         ✅ Ya está cobrado
       </label>
     </div>
-    <button class="btn" onclick="guardarTurno()">Guardar turno</button>
+    <button class="btn" id="btn-guardar-turno" onclick="guardarTurno()">Guardar turno</button>
   </div>
 </div>
 
@@ -200,7 +200,7 @@ textarea{resize:vertical;min-height:70px;}
       </label>
     </div>
     <div id="msg-editar" class="msg"></div>
-    <button class="btn" onclick="guardarEdicion()">Guardar cambios</button>
+    <button class="btn" id="btn-guardar-edicion" onclick="guardarEdicion()">Guardar cambios</button>
     <button class="btn btn-gray" style="margin-top:8px" onclick="cerrarModalEditar()">Cancelar</button>
   </div>
 </div>
@@ -401,6 +401,10 @@ function guardarTurno() {
   var hora = document.getElementById('f-hora').value;
   var msg = document.getElementById('msg-cargar');
   if (!cliente||!fecha||!hora) { msg.className='msg err'; msg.textContent='Completá Cliente, Fecha y Hora.'; return; }
+  var btn = document.getElementById('btn-guardar-turno');
+  if (btn.disabled) return;
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  function reactivarBoton() { btn.disabled = false; btn.textContent = 'Guardar turno'; }
   var turno = {
     id: nuevoIdLocal(), cliente:cliente, fecha:fecha, hora:hora,
     empleado:document.getElementById('f-empleado').value, telefono:document.getElementById('f-telefono').value,
@@ -411,16 +415,16 @@ function guardarTurno() {
   msg.className='msg ok'; msg.textContent='Guardando...';
   if (!CONFIG.urlSheet) {
     turnos.push(turno); localStorage.setItem(STORAGE_KEY,JSON.stringify(turnos)); actualizarBanner();
-    msg.textContent='✓ Guardado localmente'; limpiarForm();
+    msg.textContent='✓ Guardado localmente'; limpiarForm(); reactivarBoton();
     return;
   }
   guardarEnNube(turno).then(function(id){
     turno.id = id; turno.sincronizado = true;
     turnos.push(turno); localStorage.setItem(STORAGE_KEY,JSON.stringify(turnos)); actualizarBanner();
-    msg.textContent='✓ Turno guardado correctamente'; limpiarForm();
+    msg.textContent='✓ Turno guardado correctamente'; limpiarForm(); reactivarBoton();
   }).catch(function(){
     turnos.push(turno); localStorage.setItem(STORAGE_KEY,JSON.stringify(turnos)); actualizarBanner();
-    msg.textContent='✓ Sin conexión — guardado localmente'; limpiarForm();
+    msg.textContent='✓ Sin conexión — guardado localmente'; limpiarForm(); reactivarBoton();
   });
 }
 
@@ -480,6 +484,10 @@ function guardarEdicion() {
   var id=document.getElementById('e-id').value; var cliente=document.getElementById('e-cliente').value.trim(); var fecha=document.getElementById('e-fecha').value; var hora=document.getElementById('e-hora').value; var msg=document.getElementById('msg-editar');
   if(!cliente||!fecha||!hora){msg.className='msg err';msg.textContent='Completá Cliente, Fecha y Hora.';return;}
   var idx=-1; for(var i=0;i<turnos.length;i++){if(turnos[i].id===id){idx=i;break;}} if(idx<0)return;
+  var btn = document.getElementById('btn-guardar-edicion');
+  if (btn.disabled) return;
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  function reactivarBoton() { btn.disabled = false; btn.textContent = 'Guardar cambios'; }
   var anterior = turnos[idx];
   var actualizado = {
     id: nuevoIdLocal(), cliente:cliente, fecha:fecha, hora:hora,
@@ -491,7 +499,7 @@ function guardarEdicion() {
   msg.className='msg ok'; msg.textContent='Guardando...';
   if (!CONFIG.urlSheet) {
     turnos[idx]=actualizado; localStorage.setItem(STORAGE_KEY,JSON.stringify(turnos)); actualizarBanner();
-    msg.textContent='✓ Guardado'; setTimeout(function(){cerrarModalEditar();renderTurnos();},800);
+    msg.textContent='✓ Guardado'; reactivarBoton(); setTimeout(function(){cerrarModalEditar();renderTurnos();},800);
     return;
   }
   // Editar = crear el turno nuevo primero y borrar el viejo recién si el nuevo se confirmó.
@@ -500,10 +508,10 @@ function guardarEdicion() {
     actualizado.id = nuevoId; actualizado.sincronizado = true;
     turnos[idx]=actualizado; localStorage.setItem(STORAGE_KEY,JSON.stringify(turnos)); actualizarBanner();
     if (anterior.sincronizado) { borrarEnNube(anterior.id).catch(function(){ agregarBorradoPendiente(anterior.id); actualizarBanner(); }); }
-    msg.textContent='✓ Guardado'; setTimeout(function(){cerrarModalEditar();renderTurnos();},800);
+    msg.textContent='✓ Guardado'; reactivarBoton(); setTimeout(function(){cerrarModalEditar();renderTurnos();},800);
   }).catch(function(){
     turnos[idx]=actualizado; localStorage.setItem(STORAGE_KEY,JSON.stringify(turnos)); actualizarBanner();
-    msg.textContent='✓ Sin conexión — guardado localmente'; setTimeout(function(){cerrarModalEditar();renderTurnos();},800);
+    msg.textContent='✓ Sin conexión — guardado localmente'; reactivarBoton(); setTimeout(function(){cerrarModalEditar();renderTurnos();},800);
   });
 }
 
