@@ -348,8 +348,12 @@ if (CONFIG.urlSheet) {
     .then(function(d){
       if (!d.ok) throw new Error(d.error||'error');
       var deLaNube = d.datos.map(mapGastosRow);
-      var pendientesLocales = getGastos().filter(function(g){ return !g.sincronizado; });
-      saveGastos(deLaNube.concat(pendientesLocales));
+      var idsEnNube = {};
+      deLaNube.forEach(function(g){ idsEnNube[g.id] = true; });
+      // La nube solo puede SUMAR gastos que todavía no tengamos localmente.
+      // Nunca borramos un gasto local solo porque no aparezca en la respuesta de la nube.
+      var localesQueFaltanEnNube = getGastos().filter(function(g){ return !idsEnNube[g.id]; });
+      saveGastos(deLaNube.concat(localesQueFaltanEnNube));
       actualizarBanner(); renderLista();
     })
     .catch(function(){});

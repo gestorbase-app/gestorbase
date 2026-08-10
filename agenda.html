@@ -546,8 +546,13 @@ if (CONFIG.urlSheet) {
     .then(function(d){
       if (!d.ok) throw new Error(d.error||'error');
       var deLaNube = d.datos.map(mapAgendaRow);
-      var pendientesLocales = turnos.filter(function(t){ return !t.sincronizado; });
-      turnos = deLaNube.concat(pendientesLocales);
+      var idsEnNube = {};
+      deLaNube.forEach(function(t){ idsEnNube[t.id] = true; });
+      // La nube solo puede SUMAR turnos que todavía no tengamos localmente.
+      // Nunca borramos un turno local solo porque no aparezca en la respuesta de la nube
+      // (podría no haber llegado a guardarse por una falla, no porque se haya borrado a propósito).
+      var localesQueFaltanEnNube = turnos.filter(function(t){ return !idsEnNube[t.id]; });
+      turnos = deLaNube.concat(localesQueFaltanEnNube);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(turnos));
       actualizarBanner();
       if (document.getElementById('tab-turnos').classList.contains('active')) renderTurnos();
