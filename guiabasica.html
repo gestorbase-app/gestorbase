@@ -327,7 +327,7 @@ function doPost(e) {
 
     if (data.accion === 'guardar') {
       var id = new Date().getTime().toString();
-      var timestamp = new Date().toISOString();
+      var timestamp = new Date();
       data.fila.push(timestamp);
       data.fila.push(id);
       sheet.appendRow(data.fila);
