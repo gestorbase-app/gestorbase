@@ -257,22 +257,41 @@ function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&
 
 document.getElementById('btn-calcular').addEventListener('click', calcular);
 
+function esCobrado(v) { return !(v === false || v === 'FALSE' || v === 0 || v === '0'); }
+
+function mapAgendaRow(row) {
+  return {
+    fecha: row.Fecha || '', hora: row.Hora || '', cliente: row.Cliente || '',
+    empleado: row.Empleado || '', servicio: row.Servicio || '', monto: Number(row.Monto || 0),
+    telefono: row.Telefono || '', notas: row.Notas || '', cobrado: esCobrado(row.Cobrado), id: String(row.ID || '')
+  };
+}
+
 function calcular() {
   var mes = document.getElementById('sel-mes').value;
   var partes = mes.split('-');
   var nombreMes = MESES[parseInt(partes[1])-1] + ' ' + partes[0];
   document.getElementById('resultado').innerHTML = '<div class="empty-state">⏳ Calculando...</div>';
-  fetch(CONFIG.urlSheet + '?accion=liquidacion&mes=' + mes)
+  function conDatosLocales() {
+    var todos = getLocalTurnos();
+    procesarTurnos(todos, mes, nombreMes + ' (local)');
+  }
+  if (!CONFIG.urlSheet) { conDatosLocales(); return; }
+  fetch(CONFIG.urlSheet + '?tabla=Agenda')
     .then(function(r){ return r.json(); })
-    .then(function(data){ renderLiquidacion(data, mes, nombreMes); })
-    .catch(function(){
-      var todos = getLocalTurnos();
-      var turnos = todos.filter(function(t){ return t.fecha && t.fecha.startsWith(mes); });
-      var ingresos_por_empleado = {};
-      CONFIG.empleados.forEach(function(e){ ingresos_por_empleado[e] = 0; });
-      turnos.forEach(function(t){ if (ingresos_por_empleado[t.empleado] !== undefined) ingresos_por_empleado[t.empleado] += Number(t.monto||0); });
-      renderLiquidacion({ turnos:turnos, ingresos_por_empleado:ingresos_por_empleado }, mes, nombreMes + ' (local)');
-    });
+    .then(function(d){
+      if (!d.ok) throw new Error(d.error||'error');
+      procesarTurnos(d.datos.map(mapAgendaRow), mes, nombreMes);
+    })
+    .catch(conDatosLocales);
+}
+
+function procesarTurnos(todos, mes, nombreMes) {
+  var turnos = todos.filter(function(t){ return t.fecha && t.fecha.startsWith(mes); });
+  var ingresos_por_empleado = {};
+  CONFIG.empleados.forEach(function(e){ ingresos_por_empleado[e] = 0; });
+  turnos.forEach(function(t){ if (ingresos_por_empleado[t.empleado] !== undefined && esCobrado(t.cobrado)) ingresos_por_empleado[t.empleado] += Number(t.monto||0); });
+  renderLiquidacion({ turnos:turnos, ingresos_por_empleado:ingresos_por_empleado }, mes, nombreMes);
 }
 
 function contarLunes(mesStr) {
@@ -319,10 +338,10 @@ function renderLiquidacion(data, mes, nombreMes) {
     var detalle = '';
     if (ts.length > 0) {
       ts.sort(function(a,b){ return (a.fecha||'').localeCompare(b.fecha||''); });
-      var filas = ts.map(function(tt){ return '<div class="detalle-row"><span>' + escHtml(tt.cliente||tt.nombre||'') + ' — ' + formatFecha(tt.fecha) + ' ' + (tt.hora||'') + '</span><span>' + escHtml(tt.servicio||'-') + '</span></div>'; }).join('');
+      var filas = ts.map(function(tt){ var estado = esCobrado(tt.cobrado) ? '✅' : '⏳'; return '<div class="detalle-row"><span>' + escHtml(tt.cliente||tt.nombre||'') + ' — ' + formatFecha(tt.fecha) + ' ' + (tt.hora||'') + '</span><span>' + escHtml(tt.servicio||'-') + ' ' + estado + '</span></div>'; }).join('');
       detalle = '<button class="detalle-toggle" onclick="toggleDetalle(this)">▸ Ver detalle de turnos</button><div class="detalle-lista">' + filas + '</div>';
     }
-    html += '<div class="empleado-card"><div class="empleado-header"><div class="empleado-nombre"><div class="empleado-avatar">' + emp.charAt(0).toUpperCase() + '</div>' + escHtml(emp) + '</div><div class="badge-turnos">' + ts.length + ' turnos</div></div><div class="liq-grid"><div class="liq-stat"><div class="val">' + ts.length + '</div><div class="lab">Turnos</div></div><div class="liq-stat"><div class="val">$' + fmt(ingEmp) + '</div><div class="lab">Facturado</div></div><div class="liq-stat comision"><div class="val">$' + fmt(liq) + '</div><div class="lab">A cobrar</div></div></div>' + detalle + '</div>';
+    html += '<div class="empleado-card"><div class="empleado-header"><div class="empleado-nombre"><div class="empleado-avatar">' + emp.charAt(0).toUpperCase() + '</div>' + escHtml(emp) + '</div><div class="badge-turnos">' + ts.length + ' turnos</div></div><div class="liq-grid"><div class="liq-stat"><div class="val">' + ts.length + '</div><div class="lab">Turnos</div></div><div class="liq-stat"><div class="val">$' + fmt(ingEmp) + '</div><div class="lab">Cobrado</div></div><div class="liq-stat comision"><div class="val">$' + fmt(liq) + '</div><div class="lab">A cobrar</div></div></div>' + detalle + '</div>';
   });
   document.getElementById('resultado').innerHTML = html;
 }

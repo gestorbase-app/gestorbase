@@ -241,20 +241,18 @@ footer strong { color: white; }
         <li data-n="2">Hacé clic en el botón <strong>"+"</strong> para crear una planilla nueva.</li>
         <li data-n="3">Arriba a la izquierda, donde dice "Hoja de cálculo sin título", hacé clic y escribí <strong>GestorBase</strong>.</li>
         <li data-n="4">Abajo vas a ver una pestaña que dice <strong>"Hoja 1"</strong>. Hacé doble clic y cambiá el nombre a <strong>Agenda</strong>.</li>
-        <li data-n="5">Hacé clic en el <strong>"+"</strong> al lado de la pestaña para agregar más. Creá cuatro pestañas en total: <strong>Agenda</strong>, <strong>Gastos</strong>, <strong>Informes</strong> y <strong>Liquidacion</strong>.</li>
+        <li data-n="5">Hacé clic en el <strong>"+"</strong> al lado de la pestaña para agregar más. Creá dos pestañas en total: <strong>Agenda</strong> y <strong>Gastos</strong>.</li>
         <li data-n="6">En cada pestaña, escribí los títulos en la fila 1 (uno por columna) según la tabla de abajo.</li>
       </ul>
 
       <h3>Columnas de cada pestaña</h3>
       <table>
         <tr><th>Pestaña</th><th>Columnas (en orden, fila 1)</th></tr>
-        <tr><td><strong>Agenda</strong></td><td>Fecha, Hora, Cliente, Empleado, Servicio, Monto, Telefono, Notas, Timestamp, ID</td></tr>
+        <tr><td><strong>Agenda</strong></td><td>Fecha, Hora, Cliente, Empleado, Servicio, Monto, Telefono, Notas, Cobrado, Timestamp, ID</td></tr>
         <tr><td><strong>Gastos</strong></td><td>Fecha, Empleado, Descripcion, Categoria, Monto, Notas, Timestamp, ID</td></tr>
-        <tr><td><strong>Informes</strong></td><td>Fecha, Empleado, Cliente, Servicio, Monto, Notas, Timestamp, ID</td></tr>
-        <tr><td><strong>Liquidacion</strong></td><td>Se completa automáticamente — no hace falta escribir columnas</td></tr>
       </table>
 
-      <div class="caja info"><strong>💡 Buscador y Resumen no necesitan pestaña propia</strong>Estos dos módulos leen los datos directamente de las pestañas Agenda y Gastos. No hay que crear ni configurar ninguna pestaña adicional para ellos.</div>
+      <div class="caja info"><strong>💡 Informes, Liquidación, Buscador y Resumen no necesitan pestaña propia</strong>Estos cuatro módulos leen y calculan todo directamente a partir de las pestañas Agenda y Gastos. No hay que crear ni configurar ninguna pestaña adicional para ellos.</div>
       <div class="caja aviso"><strong>⚠️ Los nombres tienen que ser exactos</strong>Escribilos tal como aparecen arriba, sin tildes y con mayúscula al principio. Si un nombre no coincide, el sistema no va a poder guardar los datos en esa columna.</div>
 
       <p style="font-size:13px;color:var(--muted);margin-top:8px;">Así tiene que quedar la pestaña Agenda:</p>
@@ -266,25 +264,24 @@ footer strong { color: white; }
         <div class="mockup-sheet-tabs">
           <div class="mockup-tab active">Agenda</div>
           <div class="mockup-tab inactive">Gastos</div>
-          <div class="mockup-tab inactive">Informes</div>
-          <div class="mockup-tab inactive">Liquidacion</div>
         </div>
         <div style="overflow-x:auto;">
           <div class="mockup-cols">
             <div class="mockup-col-header" style="width:30px"></div>
-            <div class="mockup-col-header">A</div><div class="mockup-col-header">B</div><div class="mockup-col-header">C</div><div class="mockup-col-header">D</div><div class="mockup-col-header">E</div><div class="mockup-col-header">F</div><div class="mockup-col-header">G</div><div class="mockup-col-header">H</div>
+            <div class="mockup-col-header">A</div><div class="mockup-col-header">B</div><div class="mockup-col-header">C</div><div class="mockup-col-header">D</div><div class="mockup-col-header">E</div><div class="mockup-col-header">F</div><div class="mockup-col-header">G</div><div class="mockup-col-header">H</div><div class="mockup-col-header">I</div>
           </div>
           <div class="mockup-row">
             <div class="mockup-row-num">1</div>
-            <div class="mockup-cell header-cell">Fecha</div><div class="mockup-cell header-cell">Hora</div><div class="mockup-cell header-cell">Cliente</div><div class="mockup-cell header-cell">Empleado</div><div class="mockup-cell header-cell">Servicio</div><div class="mockup-cell header-cell">Monto</div><div class="mockup-cell header-cell">Telefono</div><div class="mockup-cell header-cell">Notas</div>
+            <div class="mockup-cell header-cell">Fecha</div><div class="mockup-cell header-cell">Hora</div><div class="mockup-cell header-cell">Cliente</div><div class="mockup-cell header-cell">Empleado</div><div class="mockup-cell header-cell">Servicio</div><div class="mockup-cell header-cell">Monto</div><div class="mockup-cell header-cell">Telefono</div><div class="mockup-cell header-cell">Notas</div><div class="mockup-cell header-cell">Cobrado</div>
           </div>
           <div class="mockup-row">
             <div class="mockup-row-num">2</div>
-            <div class="mockup-cell data" style="color:#aaa;font-style:italic;">2026-07-29</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">10:30</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Laura R.</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">María</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Corte</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">5000</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div>
+            <div class="mockup-cell data" style="color:#aaa;font-style:italic;">2026-07-29</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">10:30</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Laura R.</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">María</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Corte</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">5000</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">TRUE</div>
           </div>
         </div>
       </div>
-      <p style="font-size:12px;color:var(--muted);margin-top:4px;">📌 Buscador y Resumen no tienen pestaña propia — leen de Agenda y Gastos.</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:4px;">📌 Informes, Liquidación, Buscador y Resumen no tienen pestaña propia — leen de Agenda y Gastos.</p>
+      <div class="caja info"><strong>💡 La columna Cobrado</strong>Marca si el cliente ya pagó ese turno o todavía no. Se completa sola desde la Agenda con el checkbox "Ya está cobrado" — no hace falta tocarla a mano en la planilla. Informes, Liquidación y Resumen solo suman como ingreso los turnos marcados como cobrados.</div>
 
       <p style="font-size:13px;color:var(--muted);margin-top:16px;">Así tiene que quedar la pestaña Gastos:</p>
       <div class="mockup-sheet">
@@ -295,8 +292,6 @@ footer strong { color: white; }
         <div class="mockup-sheet-tabs">
           <div class="mockup-tab inactive">Agenda</div>
           <div class="mockup-tab active">Gastos</div>
-          <div class="mockup-tab inactive">Informes</div>
-          <div class="mockup-tab inactive">Liquidacion</div>
         </div>
         <div style="overflow-x:auto;">
           <div class="mockup-cols">
@@ -310,34 +305,6 @@ footer strong { color: white; }
           <div class="mockup-row">
             <div class="mockup-row-num">2</div>
             <div class="mockup-cell data" style="color:#aaa;font-style:italic;">2026-07-29</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">María</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Tinte</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Insumos</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">1200</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div>
-          </div>
-        </div>
-      </div>
-
-      <p style="font-size:13px;color:var(--muted);margin-top:16px;">Así tiene que quedar la pestaña Informes:</p>
-      <div class="mockup-sheet">
-        <div class="mockup-sheet-header">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" fill="#0F9D58"/><path d="M7 8h10M7 12h10M7 16h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <span class="mockup-sheet-title">GestorBase</span>
-        </div>
-        <div class="mockup-sheet-tabs">
-          <div class="mockup-tab inactive">Agenda</div>
-          <div class="mockup-tab inactive">Gastos</div>
-          <div class="mockup-tab active">Informes</div>
-          <div class="mockup-tab inactive">Liquidacion</div>
-        </div>
-        <div style="overflow-x:auto;">
-          <div class="mockup-cols">
-            <div class="mockup-col-header" style="width:30px"></div>
-            <div class="mockup-col-header">A</div><div class="mockup-col-header">B</div><div class="mockup-col-header">C</div><div class="mockup-col-header">D</div><div class="mockup-col-header">E</div><div class="mockup-col-header">F</div><div class="mockup-col-header">G</div><div class="mockup-col-header">H</div>
-          </div>
-          <div class="mockup-row">
-            <div class="mockup-row-num">1</div>
-            <div class="mockup-cell header-cell">Fecha</div><div class="mockup-cell header-cell">Empleado</div><div class="mockup-cell header-cell">Cliente</div><div class="mockup-cell header-cell">Servicio</div><div class="mockup-cell header-cell">Monto</div><div class="mockup-cell header-cell">Notas</div><div class="mockup-cell header-cell">Timestamp</div><div class="mockup-cell header-cell">ID</div>
-          </div>
-          <div class="mockup-row">
-            <div class="mockup-row-num">2</div>
-            <div class="mockup-cell data" style="color:#aaa;font-style:italic;">2026-07-29</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">María</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Laura R.</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">Corte</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;">5000</div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div><div class="mockup-cell data" style="color:#aaa;font-style:italic;"></div>
           </div>
         </div>
       </div>

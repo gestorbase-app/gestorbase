@@ -170,6 +170,28 @@ for (var a = hoy.getFullYear(); a >= hoy.getFullYear() - 3; a--) {
 function fmt(n) { return '$' + Number(n||0).toLocaleString('es-AR'); }
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+function esCobrado(v) { return !(v === false || v === 'FALSE' || v === 0 || v === '0'); }
+
+function mapAgendaRow(row) {
+  return {
+    fecha: row.Fecha || '', hora: row.Hora || '', cliente: row.Cliente || '',
+    empleado: row.Empleado || '', servicio: row.Servicio || '', monto: Number(row.Monto || 0),
+    telefono: row.Telefono || '', notas: row.Notas || '', cobrado: esCobrado(row.Cobrado), id: String(row.ID || '')
+  };
+}
+function mapGastosRow(row) {
+  return {
+    fecha: row.Fecha || '', responsable: row.Empleado || '', descripcion: row.Descripcion || '',
+    categoria: row.Categoria || '', monto: Number(row.Monto || 0), notas: row.Notas || '', id: String(row.ID || '')
+  };
+}
+
+function fetchTabla(tabla) {
+  return fetch(CONFIG.urlSheet + '?tabla=' + encodeURIComponent(tabla))
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (!d.ok) throw new Error(d.error||'error'); return d.datos || []; });
+}
+
 function getLocalData() {
   var negAgenda = CONFIG.negocio;
   var negGastos = CONFIG.negocio.replace(/\s+/g,'_');
@@ -199,19 +221,19 @@ function verRespaldoLocal() {
   var local = getLocalData();
   var turnos = filtrarPorMes(local.agenda, mes, anio, 'fecha');
   var gastos = filtrarPorMes(local.gastos, mes, anio, 'fecha');
-  var totalIngresos = turnos.reduce(function(s,t){ return s + Number(t.monto||0); }, 0);
+  var totalIngresos = turnos.filter(function(t){ return esCobrado(t.cobrado); }).reduce(function(s,t){ return s + Number(t.monto||0); }, 0);
   var totalGastos = gastos.reduce(function(s,g){ return s + Number(g.monto||0); }, 0);
   var balance = totalIngresos - totalGastos;
   var html = '<div style="background:var(--gray);border-radius:8px;padding:12px;margin-bottom:12px">' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
-    '<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase">Ingresos</div><div style="font-size:1.2rem;font-weight:700;color:var(--verde)">' + fmt(totalIngresos) + '</div></div>' +
+    '<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase">Ingresos (cobrados)</div><div style="font-size:1.2rem;font-weight:700;color:var(--verde)">' + fmt(totalIngresos) + '</div></div>' +
     '<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase">Gastos</div><div style="font-size:1.2rem;font-weight:700;color:var(--rojo)">' + fmt(totalGastos) + '</div></div>' +
     '<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase">Balance</div><div style="font-size:1.2rem;font-weight:700;color:'+(balance>=0?'var(--verde)':'var(--rojo)')+'">'+fmt(balance)+'</div></div>' +
     '<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase">Turnos</div><div style="font-size:1.2rem;font-weight:700;color:var(--accent)">'+turnos.length+'</div></div>' +
     '</div></div>';
   if (turnos.length) {
     html += '<p style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Turnos</p>';
-    html += turnos.map(function(t){ return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem">' + escHtml(t.cliente||'—') + ' · ' + escHtml(t.servicio||'') + ' · ' + fmt(t.monto) + '</div>'; }).join('');
+    html += turnos.map(function(t){ return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem">' + escHtml(t.cliente||'—') + ' · ' + escHtml(t.servicio||'') + ' · ' + fmt(t.monto) + (esCobrado(t.cobrado)?' · ✅':' · ⏳') + '</div>'; }).join('');
   }
   if (gastos.length) {
     html += '<p style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin:12px 0 6px">Gastos</p>';
@@ -230,48 +252,36 @@ function cargarInforme() {
   var mes = selMes.value; var anio = selAnio.value;
   var contenido = document.getElementById('contenido');
   contenido.innerHTML = '<p class="loading">Cargando...</p>';
-  if (!CONFIG.urlSheet) {
+  function conDatosLocales() {
     var local = getLocalData();
-    var turnos = filtrarPorMes(local.agenda, mes, anio, "fecha");
-    var gastos = filtrarPorMes(local.gastos, mes, anio, "fecha");
-    var totalIngresos = turnos.reduce(function(s,t){ return s+Number(t.monto||0); },0);
-    var totalGastos = gastos.reduce(function(s,g){ return s+Number(g.monto||0); },0);
-    renderInforme({ turnos: turnos, gastosList: gastos, ingresos: totalIngresos, gastos: totalGastos, balance: totalIngresos - totalGastos }, true);
-    return;
+    renderConDatos(local.agenda, local.gastos, mes, anio, true);
   }
-  var url = CONFIG.urlSheet + '?accion=informes&mes=' + mes + '&anio=' + anio;
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data){ renderInforme(data, false); })
-    .catch(function(){
-      var local = getLocalData();
-      var turnos = filtrarPorMes(local.agenda, mes, anio, 'fecha');
-      var gastos = filtrarPorMes(local.gastos, mes, anio, 'fecha');
-      var totalIngresos = turnos.reduce(function(s,t){ return s+Number(t.monto||0); },0);
-      var totalGastos = gastos.reduce(function(s,g){ return s+Number(g.monto||0); },0);
-      renderInforme({ turnos: turnos, gastosList: gastos, ingresos: totalIngresos, gastos: totalGastos, balance: totalIngresos - totalGastos }, true);
-    });
+  if (!CONFIG.urlSheet) { conDatosLocales(); return; }
+  Promise.all([fetchTabla('Agenda'), fetchTabla('Gastos')])
+    .then(function(res){
+      var turnos = res[0].map(mapAgendaRow);
+      var gastos = res[1].map(mapGastosRow);
+      renderConDatos(turnos, gastos, mes, anio, false);
+    })
+    .catch(conDatosLocales);
 }
 
-function renderInforme(data, esOffline) {
-  var cantTurnos = (data.turnos||[]).length;
-  var totalGastos = Number(data.gastos||0);
-  var totalIngresos = Number(data.ingresos||0);
-  var balance = Number(data.balance||0);
-  var listaGastos = data.gastosList||[];
-  var listaTurnos = data.turnos||[];
+function renderConDatos(agenda, gastosTodos, mes, anio, esOffline) {
+  var listaTurnos = filtrarPorMes(agenda, mes, anio, 'fecha');
+  var listaGastos = filtrarPorMes(gastosTodos, mes, anio, 'fecha');
+  var totalIngresos = listaTurnos.filter(function(t){ return esCobrado(t.cobrado); }).reduce(function(s,t){ return s+Number(t.monto||0); },0);
+  var totalGastos = listaGastos.reduce(function(s,g){ return s+Number(g.monto||0); },0);
+  var balance = totalIngresos - totalGastos;
   var offlineBadge = esOffline ? '<span class="offline-badge">📴 offline</span>' : '';
   var html = '<div class="cards">' +
     '<div class="card verde"><div class="label">Ingresos' + offlineBadge + '</div><div class="valor">' + fmt(totalIngresos) + '</div></div>' +
     '<div class="card rojo"><div class="label">Gastos</div><div class="valor">' + fmt(totalGastos) + '</div></div>' +
     '<div class="card ' + (balance>=0?'verde':'rojo') + '"><div class="label">Balance</div><div class="valor">' + fmt(balance) + '</div></div>' +
-    '<div class="card azul"><div class="label">Turnos</div><div class="valor">' + cantTurnos + '</div></div>' +
+    '<div class="card azul"><div class="label">Turnos</div><div class="valor">' + listaTurnos.length + '</div></div>' +
     '</div>';
-  if (esOffline) {
-  }
   if (listaTurnos.length > 0) {
-    html += '<div class="seccion"><h3>Turnos del período</h3><div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Servicio</th><th>Monto</th></tr></thead><tbody>';
-    listaTurnos.forEach(function(t){ html += '<tr><td>' + escHtml(t.fecha) + '</td><td>' + escHtml(t.cliente) + '</td><td>' + escHtml(t.servicio) + '</td><td>' + fmt(t.monto) + '</td></tr>'; });
+    html += '<div class="seccion"><h3>Turnos del período <span style="text-transform:none;font-weight:400">— los ingresos solo suman los marcados como cobrados</span></h3><div style="overflow-x:auto"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Servicio</th><th>Monto</th><th>Estado</th></tr></thead><tbody>';
+    listaTurnos.forEach(function(t){ html += '<tr><td>' + escHtml(t.fecha) + '</td><td>' + escHtml(t.cliente) + '</td><td>' + escHtml(t.servicio) + '</td><td>' + fmt(t.monto) + '</td><td>' + (esCobrado(t.cobrado)?'✅ Cobrado':'⏳ Pendiente') + '</td></tr>'; });
     html += '</tbody></table></div></div>';
   } else {
     html += '<div class="seccion"><p style="color:var(--muted);text-align:center;padding:20px">Sin turnos en este período</p></div>';

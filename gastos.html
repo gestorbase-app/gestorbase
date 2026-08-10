@@ -88,6 +88,7 @@ header h1 { flex:1; font-size:1.05rem; font-weight:600; }
     <div class="form-group"><label>Categoría</label><select id="inp-cat"></select></div>
     <div class="form-group"><label>Monto ($)</label><input type="number" id="inp-monto" placeholder="0" min="0" step="0.01"></div>
     <div class="form-group"><label>Responsable</label><select id="inp-emp"></select></div>
+    <div class="form-group"><label>Notas (opcional)</label><textarea id="inp-notas" placeholder="Observaciones..." rows="2"></textarea></div>
     <div id="msg-form" class="msg"></div>
     <button class="btn" onclick="guardarGasto()">Guardar gasto</button>
   </div>
@@ -121,6 +122,38 @@ var CONFIG = {};
 Object.keys(CONFIG_DEFAULT).forEach(function(k){ CONFIG[k] = savedConfig[k] !== undefined ? savedConfig[k] : CONFIG_DEFAULT[k]; });
 
 var STORAGE_KEY = 'gestorbase_gastos_' + CONFIG.negocio.replace(/\s+/g,'_');
+var BORRAR_KEY = STORAGE_KEY + '_borrar_pendientes';
+
+/* ── CONTRATO REAL DEL APPS SCRIPT (tabla + fila + accion:guardar|borrar) ── */
+function nuevoIdLocal() { return 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2,8); }
+
+function filaDesdeGasto(g) {
+  return [g.fecha, g.responsable, g.descripcion, g.categoria, g.monto, g.notas];
+}
+
+function mapGastosRow(row) {
+  return {
+    fecha: row.Fecha || '', responsable: row.Empleado || '', descripcion: row.Descripcion || '',
+    categoria: row.Categoria || '', monto: Number(row.Monto || 0), notas: row.Notas || '',
+    id: String(row.ID || ''), sincronizado: true
+  };
+}
+
+function guardarEnNube(gasto) {
+  return fetch(CONFIG.urlSheet, { method:'POST', body:JSON.stringify({ tabla:'Gastos', accion:'guardar', fila:filaDesdeGasto(gasto) }) })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (!d.ok) throw new Error(d.error||'Error al guardar'); return d.id; });
+}
+
+function borrarEnNube(id) {
+  return fetch(CONFIG.urlSheet, { method:'POST', body:JSON.stringify({ tabla:'Gastos', accion:'borrar', id:id }) })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (!d.ok) throw new Error(d.error||'Error al borrar'); });
+}
+
+function getBorradosPendientes() { try { return JSON.parse(localStorage.getItem(BORRAR_KEY) || '[]'); } catch(e) { return []; } }
+function agregarBorradoPendiente(id) { var arr = getBorradosPendientes(); if (arr.indexOf(id) === -1) { arr.push(id); localStorage.setItem(BORRAR_KEY, JSON.stringify(arr)); } }
+function quitarBorradoPendiente(id) { localStorage.setItem(BORRAR_KEY, JSON.stringify(getBorradosPendientes().filter(function(x){ return x !== id; }))); }
 
 function aplicarConfig() {
   document.getElementById('header-title').textContent = CONFIG.negocio + ' — Gastos';
@@ -194,65 +227,71 @@ function guardarGasto() {
   var cat = document.getElementById('inp-cat').value;
   var monto = parseFloat(document.getElementById('inp-monto').value);
   var emp = document.getElementById('inp-emp').value;
+  var notas = document.getElementById('inp-notas').value.trim();
   var msg = document.getElementById('msg-form');
   if (!fecha || !desc || !monto || monto <= 0) {
     msg.className='msg err'; msg.textContent='Completá fecha, descripción y monto.'; return;
   }
-  var registro = { fecha:fecha, descripcion:desc, categoria:cat, monto:monto, responsable:emp, ts:Date.now() };
-  if (!CONFIG.urlSheet) {
-    var arr = getGastos(); arr.push(registro); saveGastos(arr);
-    msg.className='msg ok'; msg.textContent='✅ Guardado localmente.';
-    actualizarBanner(); renderLista();
+  var gasto = { id:nuevoIdLocal(), fecha:fecha, descripcion:desc, categoria:cat, monto:monto, responsable:emp, notas:notas, sincronizado:false };
+  function limpiar() {
     document.getElementById('inp-desc').value = '';
     document.getElementById('inp-monto').value = '';
+    document.getElementById('inp-notas').value = '';
+  }
+  if (!CONFIG.urlSheet) {
+    var arr = getGastos(); arr.push(gasto); saveGastos(arr);
+    msg.className='msg ok'; msg.textContent='✅ Guardado localmente.';
+    actualizarBanner(); renderLista(); limpiar();
     return;
   }
   msg.className='msg'; msg.style.display='none';
-  fetch(CONFIG.urlSheet, { method:'POST', body:JSON.stringify(Object.assign({accion:'gastos'}, registro)) })
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (d.ok || d.status === 'ok') {
-        msg.className='msg ok'; msg.textContent='✅ Gasto guardado en la planilla.';
-        document.getElementById('inp-desc').value = '';
-        document.getElementById('inp-monto').value = '';
-      } else {
-        throw new Error(d.error || 'Error desconocido');
-      }
-    })
-    .catch(function(){
-      var arr = getGastos(); arr.push(registro); saveGastos(arr);
-      msg.className='msg err'; msg.textContent='Sin conexión. Guardado localmente. Sincronizá cuando vuelva Internet.';
-      actualizarBanner(); renderLista();
-      document.getElementById('inp-desc').value = '';
-      document.getElementById('inp-monto').value = '';
-    });
+  guardarEnNube(gasto).then(function(id){
+    gasto.id = id; gasto.sincronizado = true;
+    var arr = getGastos(); arr.push(gasto); saveGastos(arr);
+    msg.className='msg ok'; msg.textContent='✅ Gasto guardado en la planilla.';
+    actualizarBanner(); renderLista(); limpiar();
+  }).catch(function(){
+    var arr = getGastos(); arr.push(gasto); saveGastos(arr);
+    msg.className='msg err'; msg.textContent='Sin conexión. Guardado localmente. Sincronizá cuando vuelva Internet.';
+    actualizarBanner(); renderLista(); limpiar();
+  });
 }
 
 function eliminarGasto(idx) {
   if (!confirm('¿Eliminar este gasto?')) return;
-  var arr = getGastos(); arr.splice(idx,1); saveGastos(arr);
+  var arr = getGastos(); var g = arr[idx];
+  arr.splice(idx,1); saveGastos(arr);
   actualizarBanner(); renderLista();
+  if (g && g.sincronizado) {
+    if (!CONFIG.urlSheet) { agregarBorradoPendiente(g.id); actualizarBanner(); return; }
+    borrarEnNube(g.id).catch(function(){ agregarBorradoPendiente(g.id); actualizarBanner(); });
+  }
 }
 
 function actualizarBanner() {
   var datos = getGastos();
-  var count = datos.length;
-  document.getElementById('respaldo-count').textContent = count > 0 ? count + ' registros guardados localmente' : 'Sin datos pendientes';
+  if (!CONFIG.urlSheet) {
+    document.getElementById('respaldo-count').textContent = datos.length > 0 ? datos.length + ' registros guardados localmente' : 'Sin datos pendientes';
+    return;
+  }
+  var pendientes = datos.filter(function(g){ return !g.sincronizado; }).length + getBorradosPendientes().length;
+  document.getElementById('respaldo-count').textContent = pendientes > 0 ? pendientes + ' registros pendientes de sincronizar' : 'Todo sincronizado';
 }
 
 function verRespaldo() {
   var datos = getGastos();
+  var pendientes = CONFIG.urlSheet ? datos.filter(function(g){ return !g.sincronizado; }) : datos;
   var lista = document.getElementById('respaldo-lista');
   var msgR = document.getElementById('msg-respaldo');
   msgR.className = 'msg';
-  if (!datos.length) {
-    lista.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px">No hay datos guardados localmente.</p>';
+  if (!pendientes.length && !getBorradosPendientes().length) {
+    lista.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px">No hay datos pendientes de sincronizar.</p>';
     document.getElementById('btn-sincronizar').style.display = 'none';
   } else {
     document.getElementById('btn-sincronizar').style.display = 'block';
     document.getElementById('btn-sincronizar').textContent = '🔄 Sincronizar con la planilla';
     document.getElementById('btn-sincronizar').disabled = false;
-    lista.innerHTML = datos.map(function(g){
+    lista.innerHTML = pendientes.map(function(g){
       return '<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem">' +
         '<strong>' + escHtml(g.descripcion) + '</strong> — ' + escHtml(g.fecha) + ' · ' + escHtml(g.categoria) + ' · $' + Number(g.monto||0).toLocaleString('es-AR') + '</div>';
     }).join('');
@@ -263,33 +302,54 @@ function verRespaldo() {
 function cerrarRespaldo() { document.getElementById('modal-respaldo').classList.remove('open'); }
 
 function sincronizar() {
-  var datos = getGastos();
-  if (!datos.length) { alert('No hay datos para sincronizar.'); return; }
+  var pendientes = getGastos().filter(function(g){ return !g.sincronizado; });
+  var borrados = getBorradosPendientes();
+  var cola = pendientes.map(function(g){ return { tipo:'guardar', gasto:g }; })
+    .concat(borrados.map(function(id){ return { tipo:'borrar', id:id }; }));
+  if (!cola.length) { alert('No hay datos para sincronizar.'); return; }
   var btn = document.getElementById('btn-sincronizar');
   var msgR = document.getElementById('msg-respaldo');
   btn.textContent = 'Sincronizando...'; btn.disabled = true;
-  var ok = 0; var err = 0; var total = datos.length;
+  var ok = 0; var err = 0;
   function siguiente(i) {
-    if (i >= total) {
-      if (err === 0) {
-        saveGastos([]);
-        msgR.className='msg ok'; msgR.textContent='✅ '+ok+' registros sincronizados correctamente.';
-        btn.style.display='none'; actualizarBanner(); renderLista();
-      } else {
-        msgR.className='msg err'; msgR.textContent='⚠️ '+ok+' sincronizados, '+err+' con error. Intentá de nuevo.';
-        btn.textContent='🔄 Reintentar'; btn.disabled=false;
-      }
+    if (i >= cola.length) {
+      saveGastos(getGastos());
+      if (err === 0) { msgR.className='msg ok'; msgR.textContent='✅ '+ok+' registros sincronizados correctamente.'; btn.style.display='none'; }
+      else { msgR.className='msg err'; msgR.textContent='⚠️ '+ok+' sincronizados, '+err+' con error. Intentá de nuevo.'; btn.textContent='🔄 Reintentar'; btn.disabled=false; }
+      actualizarBanner(); renderLista();
       return;
     }
-    fetch(CONFIG.urlSheet, { method:'POST', body:JSON.stringify(Object.assign({accion:'gastos'}, datos[i])) })
-      .then(function(){ ok++; siguiente(i+1); })
-      .catch(function(){ err++; siguiente(i+1); });
+    var item = cola[i];
+    if (item.tipo === 'guardar') {
+      guardarEnNube(item.gasto).then(function(id){
+        var arr = getGastos();
+        for (var k=0;k<arr.length;k++){ if (arr[k].id===item.gasto.id){ arr[k].id=id; arr[k].sincronizado=true; break; } }
+        saveGastos(arr);
+        ok++; siguiente(i+1);
+      }).catch(function(){ err++; siguiente(i+1); });
+    } else {
+      borrarEnNube(item.id).then(function(){ quitarBorradoPendiente(item.id); ok++; siguiente(i+1); })
+        .catch(function(){ err++; siguiente(i+1); });
+    }
   }
   siguiente(0);
 }
 
 actualizarBanner();
 renderLista();
+
+if (CONFIG.urlSheet) {
+  fetch(CONFIG.urlSheet + '?tabla=Gastos')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.ok) throw new Error(d.error||'error');
+      var deLaNube = d.datos.map(mapGastosRow);
+      var pendientesLocales = getGastos().filter(function(g){ return !g.sincronizado; });
+      saveGastos(deLaNube.concat(pendientesLocales));
+      actualizarBanner(); renderLista();
+    })
+    .catch(function(){});
+}
 </script>
 </body>
 </html>

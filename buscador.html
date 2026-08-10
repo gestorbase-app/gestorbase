@@ -172,7 +172,7 @@ aplicarConfig();
 var neg = CONFIG.negocio.replace(/\s+/g,'_');
 function getLocalData() {
   var agenda = []; var gastos = [];
-  try { agenda = JSON.parse(localStorage.getItem('gestorbase_agenda_' + neg) || '[]'); } catch(e){}
+  try { agenda = JSON.parse(localStorage.getItem('gestorbase_agenda_' + CONFIG.negocio) || '[]'); } catch(e){}
   try { gastos = JSON.parse(localStorage.getItem('gestorbase_gastos_' + neg) || '[]'); } catch(e){}
   return { turnos: agenda, gastos: gastos };
 }
@@ -204,13 +204,33 @@ var todosDatos = { turnos: [], gastos: [] };
 
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+function esCobrado(v) { return !(v === false || v === 'FALSE' || v === 0 || v === '0'); }
+
+function mapAgendaRow(row) {
+  return {
+    fecha: row.Fecha || '', hora: row.Hora || '', cliente: row.Cliente || '',
+    empleado: row.Empleado || '', servicio: row.Servicio || '', monto: Number(row.Monto || 0),
+    telefono: row.Telefono || '', notas: row.Notas || '', cobrado: esCobrado(row.Cobrado), id: String(row.ID || '')
+  };
+}
+function mapGastosRow(row) {
+  return {
+    fecha: row.Fecha || '', responsable: row.Empleado || '', descripcion: row.Descripcion || '',
+    categoria: row.Categoria || '', monto: Number(row.Monto || 0), notas: row.Notas || '', id: String(row.ID || '')
+  };
+}
+function fetchTabla(tabla) {
+  return fetch(CONFIG.urlSheet + '?tabla=' + encodeURIComponent(tabla))
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (!d.ok) throw new Error(d.error||'error'); return d.datos || []; });
+}
+
 cargarDatos();
 
 function cargarDatos() {
   if (!CONFIG.urlSheet) { todosDatos = getLocalData(); return; }
-  fetch(CONFIG.urlSheet + '?accion=buscarTodo')
-    .then(function(r){ return r.json(); })
-    .then(function(data){ todosDatos = data; })
+  Promise.all([fetchTabla('Agenda'), fetchTabla('Gastos')])
+    .then(function(res){ todosDatos = { turnos: res[0].map(mapAgendaRow), gastos: res[1].map(mapGastosRow) }; })
     .catch(function(){ todosDatos = getLocalData(); });
 }
 
@@ -241,7 +261,7 @@ function buscar() {
       tf.forEach(function(t){ var k=(t.cliente||'').toLowerCase(); if (!porCliente[k]) porCliente[k]={cliente:t.cliente,turnos:[],telefono:t.telefono}; porCliente[k].turnos.push(t); });
       Object.values(porCliente).forEach(function(c){ resultados.push({tipo:'cliente',cliente:c.cliente,turnos:c.turnos,telefono:c.telefono}); });
     } else {
-      tf.forEach(function(t){ resultados.push({tipo:'turno',cliente:t.cliente,fecha:t.fecha,hora:t.hora,servicio:t.servicio,monto:t.monto}); });
+      tf.forEach(function(t){ resultados.push({tipo:'turno',cliente:t.cliente,fecha:t.fecha,hora:t.hora,servicio:t.servicio,monto:t.monto,cobrado:t.cobrado}); });
     }
   }
   if (filtroActivo === 'todo' || filtroActivo === 'gastos') {
@@ -261,7 +281,7 @@ function renderResultados(resultados, q) {
       var ult = ts[ts.length-1];
       html += '<div class="cliente-card"><div class="cliente-header"><div class="cliente-avatar">' + (r.cliente||'?').charAt(0).toUpperCase() + '</div><div><div class="cliente-nombre">' + resaltar(r.cliente,q) + '</div><div class="cliente-subtitulo">' + (r.telefono?'📞 '+r.telefono:'Sin teléfono') + '</div></div></div><div class="cliente-stats"><div class="cli-stat"><div class="val">' + ts.length + '</div><div class="lab">Turnos</div></div><div class="cli-stat"><div class="val">$' + fmt(total) + '</div><div class="lab">Total</div></div><div class="cli-stat"><div class="val">' + (ult?ult.fecha:'-') + '</div><div class="lab">Último</div></div></div>' + (ult?'<div class="ultimo-turno">Último servicio: '+escHtml(ult.servicio||'-')+'</div>':'') + '</div>';
     } else if (r.tipo === 'turno') {
-      html += '<div class="resultado-card"><div class="res-tipo turno">📅 Turno</div><div class="res-nombre">' + resaltar(r.cliente||'-',q) + '</div><div class="res-detalle">' + escHtml(r.fecha||'') + ' ' + escHtml(r.hora||'') + ' · ' + resaltar(r.servicio||'-',q) + '</div>' + (r.monto?'<div class="res-monto ing">$'+fmt(r.monto)+'</div>':'') + '</div>';
+      html += '<div class="resultado-card"><div class="res-tipo turno">📅 Turno</div><div class="res-nombre">' + resaltar(r.cliente||'-',q) + '</div><div class="res-detalle">' + escHtml(r.fecha||'') + ' ' + escHtml(r.hora||'') + ' · ' + resaltar(r.servicio||'-',q) + '</div>' + (r.monto?'<div class="res-monto ing">$'+fmt(r.monto)+' '+(esCobrado(r.cobrado)?'✅':'⏳')+'</div>':'') + '</div>';
     } else if (r.tipo === 'gasto') {
       html += '<div class="resultado-card tipo-gasto"><div class="res-tipo gasto">💸 Gasto</div><div class="res-nombre">' + resaltar(r.descripcion||'-',q) + '</div><div class="res-detalle">' + escHtml(r.fecha||'') + ' · ' + resaltar(r.categoria||'-',q) + '</div><div class="res-monto gas">-$' + fmt(r.monto) + '</div></div>';
     }

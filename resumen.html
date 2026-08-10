@@ -198,7 +198,7 @@ aplicarConfig();
 var neg = CONFIG.negocio.replace(/\s+/g,'_');
 function getLocalData() {
   var agenda = []; var gastos = [];
-  try { agenda = JSON.parse(localStorage.getItem('gestorbase_agenda_' + neg) || '[]'); } catch(e){}
+  try { agenda = JSON.parse(localStorage.getItem('gestorbase_agenda_' + CONFIG.negocio) || '[]'); } catch(e){}
   try { gastos = JSON.parse(localStorage.getItem('gestorbase_gastos_' + neg) || '[]'); } catch(e){}
   return { turnos: agenda, gastos: gastos };
 }
@@ -224,20 +224,45 @@ function cerrarRespaldo() { document.getElementById('modal-respaldo').classList.
 
 document.getElementById('btn-actualizar').addEventListener('click', cargarTodo);
 
-function cargarTodo() {
-  if (!CONFIG.urlSheet) { renderTodo({ ingresos:0, gastos_total:0, balance:0, turnos_mes:[] }); return; }
-  fetch(CONFIG.urlSheet + '?accion=resumen')
+function esCobrado(v) { return !(v === false || v === 'FALSE' || v === 0 || v === '0'); }
+
+function mapAgendaRow(row) {
+  return {
+    fecha: row.Fecha || '', hora: row.Hora || '', cliente: row.Cliente || '',
+    empleado: row.Empleado || '', servicio: row.Servicio || '', monto: Number(row.Monto || 0),
+    telefono: row.Telefono || '', notas: row.Notas || '', cobrado: esCobrado(row.Cobrado), id: String(row.ID || '')
+  };
+}
+function mapGastosRow(row) {
+  return {
+    fecha: row.Fecha || '', responsable: row.Empleado || '', descripcion: row.Descripcion || '',
+    categoria: row.Categoria || '', monto: Number(row.Monto || 0), notas: row.Notas || '', id: String(row.ID || '')
+  };
+}
+function fetchTabla(tabla) {
+  return fetch(CONFIG.urlSheet + '?tabla=' + encodeURIComponent(tabla))
     .then(function(r){ return r.json(); })
-    .then(function(data){ renderTodo(data); })
-    .catch(function(){
-      var local = getLocalData();
-      var hoy = new Date();
-      var mesStr = hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0');
-      var turnosMes = local.turnos.filter(function(t){ return t.fecha && t.fecha.startsWith(mesStr); });
-      var ingresos = turnosMes.reduce(function(s,t){ return s+Number(t.monto||0); },0);
-      var gastos_total = local.gastos.filter(function(g){ return g.fecha && g.fecha.startsWith(mesStr); }).reduce(function(s,g){ return s+Number(g.monto||0); },0);
-      renderTodo({ ingresos:ingresos, gastos_total:gastos_total, balance:ingresos-gastos_total, turnos_mes:turnosMes });
-    });
+    .then(function(d){ if (!d.ok) throw new Error(d.error||'error'); return d.datos || []; });
+}
+
+function cargarTodo() {
+  function conDatosLocales() {
+    var local = getLocalData();
+    procesarDatos(local.turnos, local.gastos);
+  }
+  if (!CONFIG.urlSheet) { conDatosLocales(); return; }
+  Promise.all([fetchTabla('Agenda'), fetchTabla('Gastos')])
+    .then(function(res){ procesarDatos(res[0].map(mapAgendaRow), res[1].map(mapGastosRow)); })
+    .catch(conDatosLocales);
+}
+
+function procesarDatos(turnos, gastos) {
+  var hoy = new Date();
+  var mesStr = hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0');
+  var turnosMes = turnos.filter(function(t){ return t.fecha && t.fecha.startsWith(mesStr); });
+  var ingresos = turnosMes.filter(function(t){ return esCobrado(t.cobrado); }).reduce(function(s,t){ return s+Number(t.monto||0); },0);
+  var gastos_total = gastos.filter(function(g){ return g.fecha && g.fecha.startsWith(mesStr); }).reduce(function(s,g){ return s+Number(g.monto||0); },0);
+  renderTodo({ ingresos:ingresos, gastos_total:gastos_total, balance:ingresos-gastos_total, turnos_mes:turnosMes });
 }
 
 function renderTodo(data) {
@@ -262,7 +287,7 @@ function renderTodo(data) {
   }
   var porEmp = {};
   CONFIG.empleados.forEach(function(e){ porEmp[e]={turnos:0,monto:0}; });
-  turnosMes.forEach(function(t){ if (t.empleado&&porEmp[t.empleado]!==undefined){ porEmp[t.empleado].turnos++; porEmp[t.empleado].monto+=Number(t.monto||0); } });
+  turnosMes.forEach(function(t){ if (t.empleado&&porEmp[t.empleado]!==undefined){ porEmp[t.empleado].turnos++; if (esCobrado(t.cobrado)) porEmp[t.empleado].monto+=Number(t.monto||0); } });
   document.getElementById('empleados-resumen').innerHTML = CONFIG.empleados.map(function(emp){
     return '<div class="empleado-row"><div class="emp-avatar">'+emp.charAt(0)+'</div><div class="emp-info"><div class="emp-nombre">'+emp+'</div><div class="emp-turnos">'+porEmp[emp].turnos+' turno(s) este mes</div></div><div class="emp-monto">$'+fmt(porEmp[emp].monto)+'</div></div>';
   }).join('');
