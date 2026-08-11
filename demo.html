@@ -658,7 +658,7 @@ function togglePlay() {
 
 function iniciar() {
   if (activo) return;
-  var mus = document.getElementById("music"); if(mus){mus.volume=0.02;mus.currentTime=0;mus.play().catch(function(){});}
+  var mus = document.getElementById("music"); if(mus){mus.volume=0.18;mus.currentTime=0;mus.play().catch(function(){});}
   activo = true;
   estado = 'reproduciendo';
   actualizarBotonToggle();
