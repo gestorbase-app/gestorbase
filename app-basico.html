@@ -29,6 +29,11 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
 .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1.5px solid #e2e6f0; border-radius: 7px; font-size: 0.95rem; font-family: inherit; color: #1a1a2e; background: white; }
 .form-group textarea { resize: vertical; min-height: 80px; }
+.btn-test-conexion { margin-top: 8px; padding: 8px 14px; background: #f0f2f7; color: #1a1a2e; border: 1.5px solid #e2e6f0; border-radius: 7px; font-size: 0.85rem; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+.btn-test-conexion:disabled { opacity: 0.6; }
+.test-conexion-msg { margin-top: 8px; font-size: 0.85rem; font-weight: 600; display: none; }
+.test-conexion-msg.ok { display: block; color: #067647; }
+.test-conexion-msg.err { display: block; color: #b42318; }
 .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .color-row input[type="color"] { height: 44px; padding: 4px 6px; cursor: pointer; }
 .btn-cfg { width: 100%; padding: 13px; background: var(--accent, #0057d9); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
@@ -84,8 +89,10 @@ header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
     </div>
     <div class="form-group">
       <label>URL de tu planilla Google</label>
-      <input type="url" id="cfg-url" placeholder="https://script.google.com/...">
-    </div>
+              <input type="url" id="cfg-url" placeholder="https://script.google.com/...">
+        <button type="button" class="btn-test-conexion" id="btn-test-conexion">🔌 Probar conexión</button>
+        <div id="test-conexion-msg" class="test-conexion-msg"></div>
+      </div>
     <div class="color-row">
       <div class="form-group">
         <label>Color principal</label>
@@ -222,6 +229,35 @@ var keys = Object.keys(CONFIG_DEFAULT);
 for (var ki = 0; ki < keys.length; ki++) {
   CONFIG[keys[ki]] = savedConfig[keys[ki]] !== undefined ? savedConfig[keys[ki]] : CONFIG_DEFAULT[keys[ki]];
 }
+
+document.getElementById('btn-test-conexion').addEventListener('click', function() {
+  var url = document.getElementById('cfg-url').value.trim();
+  var btn = document.getElementById('btn-test-conexion');
+  var msg = document.getElementById('test-conexion-msg');
+  msg.className = 'test-conexion-msg';
+  msg.textContent = '';
+  if (!url) {
+    msg.className = 'test-conexion-msg err';
+    msg.textContent = '⚠️ Primero pegá la URL de tu planilla.';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Probando...';
+  fetch(url + '?tabla=Agenda')
+    .then(function(r) { return r.json(); })
+    .then(function() {
+      msg.className = 'test-conexion-msg ok';
+      msg.textContent = '✅ Conectado correctamente.';
+    })
+    .catch(function() {
+      msg.className = 'test-conexion-msg err';
+      msg.textContent = '❌ No se pudo conectar. Revisá que hayas desplegado el Apps Script como "Web App" con acceso "Cualquier usuario".';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = '🔌 Probar conexión';
+    });
+});
 
 function aplicarConfig() {
   document.getElementById('header-negocio').textContent = CONFIG.negocio;
